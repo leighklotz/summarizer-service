@@ -28,10 +28,10 @@ app = Flask(__name__)
 def index():
       return render_template("index.page", stats=get_stats())
 
-@app.route("/scuttle", methods=["GET"])
+@app.route("/scuttle", methods=["GET", "POST"])
 def summarize_for_scuttle():
       url = request.args.get('url')
-      if url:
+      if request.method == "POST" and url:
             return redirect(call_scuttle(url))
       else:
             return render_template("scuttle.page", data={}, stats=get_stats())
