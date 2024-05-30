@@ -28,7 +28,7 @@ class HomeCard(Card):
        super().__init__()
 
    def get_template(self):
-       return render_template("index.page", stats=self.stats)
+       return render_template("cards/home/index.page", stats=self.stats)
 
 class SummarizeCard(Card):
    def __init__(self, url=None, prompt='Summarize'):
@@ -39,7 +39,7 @@ class SummarizeCard(Card):
 
    def get_template(self):
        data = {'url': self.url, 'prompt': self.prompt, 'summary': self.summary}
-       return render_template("summarize.page", data=data, stats=self.stats)
+       return render_template("cards/summarize/index.page", data=data, stats=self.stats)
 
    def process(self):
        if self.url and self.prompt:
@@ -54,7 +54,7 @@ class ScuttleCard(Card):
        self.scuttle_url = None
 
    def get_template(self):
-       return render_template("scuttle.page", data={}, stats=self.stats)
+       return render_template("cards/scuttle/index.page", data={}, stats=self.stats)
 
    def process(self):
        if self.url:

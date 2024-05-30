@@ -32,7 +32,7 @@
       <option value="Write help text to add to this web page"? />
     </datalist>
     <div class="accordion">
-      {% include('summarize-help.body') %}
+      {% include('cards/summarize/help.body') %}
     </div>
     </main>
     {% include('footer.body') %}
