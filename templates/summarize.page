@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summarizer</title>
+    {% include('links.body') %}
+    <style>{% include('hallux.css') %}</style>
+    <style>{% include('style.css') %}</style>
+  </head>
+  <body>
+    {% include('nav.body') %}
+    <main>
+      <h1>Summarizer</h1>
+      <form method="POST">
+        <div id="grid">
+          <label for="url">Enter URL:</label>
+          <input type="url" id="url" name="url" value="{{data.url}}" required>
+          <label for="prompt">Prompt:</label>
+          <input type="text" id="prompt" name="prompt" value="{{data.prompt}}" required list="prompts" />
+          <button type="submit">Summarize</button>
+        </div>
+      </form>
+      <hr />
+      <div>
+        {% for para in data.summary.split('\n') %}
+        <p>{{para}}</p>
+        {% endfor %}
+      </div>
+    <datalist id="prompts">
+      <option value="Summarize">
+      <option value="Summarize as bullet points">
+      <option value="Summarize the main points">
+      <option value="What is unusual about this?">
+    </datalist>
+    </main>
+    <hr />
+    {% include('footer.body') %}
+  </body>
+</html>
+

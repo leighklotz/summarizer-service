@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scuttle Summarizer</title>
+    {% include('links.body') %}
+    <style>{% include('hallux.css') %}</style>
+    <style>{% include('style.css') %}</style>
+  </head>
+  <body>
+    {% include('nav.body') %}
+    <main>
+      <h1>Scuttle Summarizer</h1>
+      <form method="POST">
+        <div id="grid">
+	  <label for="url">Enter URL:</label>
+	  <input type="url" id="url" name="url" required>
+	</div>
+	<button type="submit">Scuttle</button>
+      </form>
+    </main>
+    {% include('footer.body') %}
+  </body>
+</html>

@@ -1,0 +1,4 @@
+<hr />
+<nav>{{stats.model_name}} / {{stats.nvfree}} free <a href="https://github.com/leighklotz/summarizer-service">source</a></nav>
+
+
