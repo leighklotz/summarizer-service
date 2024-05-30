@@ -30,13 +30,17 @@ def index():
 
 @app.route("/scuttle", methods=["GET", "POST"])
 def summarize_for_scuttle():
-      url = request.args.get('url')
-      if request.method == "POST" and url:
+    if request.method == "POST":
+        url = request.form.get('url')
+        if url:
             return redirect(call_scuttle(url))
-      else:
-            return render_template("scuttle.page", data={}, stats=get_stats())
-
-# To address the 'todo' items in the given Python Flask code, we will modify the `summarize_with_prompt` function to accept both GET and POST requests, and perform the appropriate actions based on the request method. Here's the updated code:
+        else:
+            stats = get_stats()
+            return render_template("scuttle.page", data={}, stats=stats)
+    else:
+        url = request.form.get('url', '')
+        stats = get_stats()
+        return render_template("scuttle.page", data={'url': url}, stats=stats)
 
 @app.route("/summarize", methods=["GET", "POST"])
 def summarize_with_prompt():

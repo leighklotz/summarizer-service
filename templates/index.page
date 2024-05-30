@@ -13,7 +13,6 @@
   <main>
     <p>Pick a service above.</a>
   </main>
-  <hr />
   {% include('footer.body') %}
 </body>
 </html>

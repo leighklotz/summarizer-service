@@ -19,6 +19,8 @@
 	</div>
 	<button type="submit">Scuttle</button>
       </form>
+      <hr />
+      {% include('scuttle-help.body') %}
     </main>
     {% include('footer.body') %}
   </body>
