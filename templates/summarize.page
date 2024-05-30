@@ -7,6 +7,7 @@
     {% include('links.body') %}
     <style>{% include('hallux.css') %}</style>
     <style>{% include('style.css') %}</style>
+    <script>{% include('accordion.js') %}</script>
   </head>
   <body>
     {% include('nav.body') %}
@@ -34,9 +35,10 @@
       <option value="What is unusual about this?" />
       <option value="Write help text to add to this web page"? />
     </datalist>
+    <div class="accordion">
+      {% include('summarize-help.body') %}
+    </div>
     </main>
-    <hr />
-    {% include('summarize-help.body') %}
     {% include('footer.body') %}
   </body>
 </html>

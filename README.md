@@ -5,7 +5,11 @@ Summarizer Service is a bare-bones sample Flask web application using Flask, usi
 ### Installation
 The app is designed to use  <a href="https://github.com/leighklotz/llamafiles">llamafiles</a>, but is easily adapted to use other mechanisms for LLM access.
 
-Install <a href="https://github.com/leighklotz/llamafiles">llamafiles</a>.
+Install <a href="https://github.com/leighklotz/llamafiles">llamafiles</a> and edit `config.py` accordingly.
+```bash
+cp config.py.example config.py
+emacs config.py
+```
 
 Clone this repository:
 ```bash

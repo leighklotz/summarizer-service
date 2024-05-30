@@ -7,6 +7,8 @@
     {% include('links.body') %}
     <style>{% include('hallux.css') %}</style>
     <style>{% include('style.css') %}</style>
+    <style>{% include('accordion.css') %}</style>
+    <script>{% include('accordion.js') %}</script>
   </head>
   <body>
     {% include('nav.body') %}
@@ -20,7 +22,9 @@
 	<button type="submit">Scuttle</button>
       </form>
       <hr />
-      {% include('scuttle-help.body') %}
+      <div class="accordion">
+	{% include('scuttle-help.body') %}
+      </div>
     </main>
     {% include('footer.body') %}
   </body>
