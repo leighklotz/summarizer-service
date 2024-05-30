@@ -1,16 +1,16 @@
-    <h2>Scuttle Summarizer Guide</h2>
-    <p>Scuttle Summarizer is a web-based tool that helps users to summarize articles or web pages quickly. Here's a step-by-step guide on how to use it:</p>
-    <ol>
-        <li>Enter the URL of the web page you want to summarize in the "Enter URL" box.</li>
-        <li>Click the "Scuttle" button.</li>
-        <li>You will be redirected to the Scuttle site with the title, description, and keywords suggested.</li>
-        <li>Edit or submit the resulting Scuttle page.</li>
-    </ol>
-    <h2>Tips</h2>
-    <ul>
-        <li>Ensure the entered URL is correct and points to a valid web page.</li>
-        <li>If the page is too large, the summarizer might not work correctly.</li>
-    </ul>
-    <p>Happy summarizing with Scuttle Summarizer!</p>
+<h2>Scuttle Summarizer Guide</h2>
+<p>Scuttle Summarizer is a web-based tool that helps users to summarize articles or web pages quickly. Here's a step-by-step guide on how to use it:</p>
+<ol>
+  <li>Enter the URL of the web page you want to summarize in the "Enter URL" box.</li>
+  <li>Click the "Scuttle" button.</li>
+  <li>You will be redirected to the Scuttle site with the title, description, and keywords suggested.</li>
+  <li>Edit or submit the resulting Scuttle page.</li>
+</ol>
+<h2>Tips</h2>
+<ul>
+  <li>Ensure the entered URL is correct and points to a valid web page.</li>
+  <li>If the page is too large, the summarizer might not work correctly.</li>
+</ul>
+<p>Happy summarizing with Scuttle Summarizer!</p>
 
 

@@ -29,12 +29,14 @@
       </div>
     <datalist id="prompts">
       <option value="Summarize">
-      <option value="Summarize as bullet points">
-      <option value="Summarize the main points">
-      <option value="What is unusual about this?">
+      <option value="Summarize as bullet points" />
+      <option value="Summarize the main points" />
+      <option value="What is unusual about this?" />
+      <option value="Write help text to add to this web page"? />
     </datalist>
     </main>
     <hr />
+    {% include('summarize-help.body') %}
     {% include('footer.body') %}
   </body>
 </html>

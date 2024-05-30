@@ -1,4 +1,4 @@
-    <nav>
+    <nav class="main-header">
       <a href="/">Home</a>
       <a href="scuttle">Scuttle</a>
       <a href="summarize">Summarize</a>
