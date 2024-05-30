@@ -17,7 +17,7 @@
 	<div id="loading"></div>
       </form>
       <hr />
-      {% include('scuttle-help.body') %}
+      {% include('cards/scuttle/help.body') %}
     </main>
     {% include('footer.body') %}
   </body>
