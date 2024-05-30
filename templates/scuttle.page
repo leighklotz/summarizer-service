@@ -22,9 +22,7 @@
 	<button type="submit">Scuttle</button>
       </form>
       <hr />
-      <div class="accordion">
-	{% include('scuttle-help.body') %}
-      </div>
+      {% include('scuttle-help.body') %}
     </main>
     {% include('footer.body') %}
   </body>

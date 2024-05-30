@@ -1,11 +1,13 @@
+<button class="accordion">Guide</button>
+<div class="panel">
 <h2>Article Summarizer Guide</h2>
-
 <div>
-  <p>This web application allows you to input a URL and receive a summary of the associated article. Follow the steps below:</p>
-  <ol>
-    <li>Enter the URL of the article you'd like to summarize in the "<strong>Enter URL</strong>" field.</li>
-    <li>Click the "<strong>Summarize</strong>" button to initiate the summarization process.</li>
-    <li>The application will then generate a concise summary of the article, which will be displayed in the three text boxes below the input fields.</li>
-  </ol>
-  <p>Enjoy the convenience of quickly digesting long articles with our Article Summarizer!</p>
+<p>This web application allows you to input a URL and receive a summary of the associated article. Follow the steps below:</p>
+<ol>
+<li>Enter the URL of the article you'd like to summarize in the "<strong>Enter URL</strong>" field.</li>
+<li>Click the "<strong>Summarize</strong>" button to initiate the summarization process.</li>
+<li>The application will then generate a concise summary of the article, which will be displayed in the three text boxes below the input fields.</li>
+</ol>
+<p>Enjoy the convenience of quickly digesting long articles with our Article Summarizer!</p>
+</div>
 </div>
