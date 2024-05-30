@@ -1,16 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Summarizer</title>
-    {% include('links.body') %}
-    <style>{% include('hallux.css') %}</style>
-    <style>{% include('style.css') %}</style>
-    <style>{% include('loading.css') %}</style>
-    <style>{% include('accordion.css') %}</style>
-    <script>{% include('accordion.js') %}</script>
-    <script>{% include('loading.js') %}</script>
+    {% include('header.body') %}
   </head>
   <body>
     {% include('nav.body') %}
