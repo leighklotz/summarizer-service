@@ -51,7 +51,7 @@ class ScuttleCard(Card):
    def __init__(self, url=None):
        super().__init__()
        self.url = url
-       self.scuttle_url = ''
+       self.scuttle_url = None
 
    def get_template(self):
        return render_template("scuttle.page", data={}, stats=self.stats)
