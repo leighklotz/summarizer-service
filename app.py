@@ -15,7 +15,7 @@ def get_stats():
   # Fetch stats from the system
   nvfree = (check_output([NVFREE_BIN]).decode('utf-8') or "0").strip()
   model_name = (check_output([VIA_API_BIN, '--get-model-name']).decode('utf-8') or "Mistral?").strip()
-  stats = {'nvfree': nvfree, 'model_name': model_name}
+  stats = {'nvfree': nvfree, 'model_name': model_name, 'openapi_ui_server': OPENAPI_UI_SERVER}
   return stats
 
 def summarize(url, prompt):
