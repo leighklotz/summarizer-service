@@ -1,4 +1,4 @@
-body { margin-left: 2pt; }
+body { margin-left: 4pt; }
 #grid { 
     display: grid; 
     grid-template-columns: auto 1fr; 
