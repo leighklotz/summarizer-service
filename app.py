@@ -17,10 +17,7 @@ import json
 from flask import Flask, url_for
 import codecs
 
-SCUTTLE_BIN="/home/klotz/wip/llamafiles/scripts/scuttle.sh"
-SUMMARIZE_BIN="/home/klotz/wip/llamafiles/scripts/summarize.sh"
-NVFREE_BIN="/home/klotz/wip/llamafiles/scripts/nvfree.sh"
-VIA_API_BIN="/home/klotz/wip/llamafiles/scripts/via-api.sh"
+from config import *
 
 app = Flask(__name__)
 
