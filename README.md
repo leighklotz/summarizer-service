@@ -2,6 +2,10 @@
 
 Summarizer Service is a bare-bones sample Flask web application using Flask, using subprocesses and custom scripts. The application provides text web page summarization for bookmarking services, accepting both GET and POST requests with or without a custom prompt.
 
+## Example
+
+![Summarizer Screenshot](docs/summarizer-screenshot.png)
+
 ### Installation
 The app is designed to use  <a href="https://github.com/leighklotz/llamafiles">llamafiles</a>, but is easily adapted to use other mechanisms for LLM access.
 
