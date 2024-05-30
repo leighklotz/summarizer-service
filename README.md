@@ -1,6 +1,7 @@
 # Summarizer Service
 
-Summarizer Service is a bare-bones sample Flask web application using Flask, using subprocesses and custom scripts. The application provides text web page summarization for bookmarking services, accepting both GET and POST requests with or without a custom prompt.
+Summarizer Service is a bare-bones sample Flask web application using Flask, using subprocesses and custom scripts.
+The application provides text web page summarization for bookmarking services, accepting both GET and POST requests with or without a custom prompt.
 
 ## Example
 
@@ -41,10 +42,12 @@ flask run --host 127.0.0.1 --port 8080
 
 The application will be accessible at `http://localhost:8080`.
 
-### Pages
-- `/`: Home page
-- `/scuttle?url=`: Scuttle bookmarking service
-- `/summarize?url=&prompt=`: Text summarization with optional prompt
+### Cards
+- `/`: Home card
+- `/scuttle?url=`: Scuttle bookmarking service card
+- `/summarize?url=&prompt=`: Text summarization with optional prompt card
+
+Cards are implemented in `app.py` and with templates in `templates/cards/cardname`.
 
 ### License
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
