@@ -42,7 +42,7 @@ class SummarizeCard(Card):
        return render_template("cards/summarize/index.page", data=data, stats=self.stats)
 
    def process(self):
-       if self.url and self.prompt:
+       if self.url:
           # Summarize the text from the URL using the provided prompt
           self.summary = check_output([SUMMARIZE_BIN, self.url, self.prompt]).decode('utf-8')
 
@@ -99,10 +99,10 @@ def summarize_with_prompt():
    card = SummarizeCard()
    if request.method == "GET":
        card.url = request.args.get('url', '')
-       card.prompt = request.args.get('prompt', 'Summarize')
+       card.prompt = request.args.get('prompt', '')
    elif request.method == "POST":
        card.url = request.form.get('url')
-       card.prompt = request.form.get('prompt')
+       card.prompt = request.form.get('prompt', '')
        card.process()
    return card.get_template()
 

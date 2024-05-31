@@ -12,8 +12,8 @@
         <div id="grid">
           <label for="url">Enter URL:</label>
           <input type="url" id="url" name="url" value="{{data.url}}" required>
-          <label for="prompt">Prompt:</label>
-          <input type="text" id="prompt" name="prompt" value="{{data.prompt}}" required list="prompts" />
+          <label for="prompt">Optional Prompt:</label>
+          <input type="text" id="prompt" name="prompt" value="{{data.prompt}}" list="prompts" />
           <button type="submit" id="submit-button">Summarize</button>
 	  <div id="loading"></div>
         </div>
@@ -25,6 +25,7 @@
         {% endfor %}
       </div>
     <datalist id="prompts">
+      <option value="">
       <option value="Summarize">
       <option value="Summarize as bullet points" />
       <option value="Summarize the main points" />
