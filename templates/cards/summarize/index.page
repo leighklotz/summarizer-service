@@ -30,7 +30,7 @@
       <option value="Summarize as bullet points" />
       <option value="Summarize the main points" />
       <option value="What is unusual about this?" />
-      <option value="Write help text to add to this web page"? />
+      <option value="Write help text to add to this web page" />
     </datalist>
     <div class="accordion">
       {% include('cards/summarize/help.body') %}
