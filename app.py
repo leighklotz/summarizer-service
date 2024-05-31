@@ -64,8 +64,9 @@ class ScuttleCard(Card):
           return self.get_template()
 
    def call_scuttle(self, url):
+      import pdb;pdb.set_trace()
       output = check_output([SCUTTLE_BIN, '--json', url]).decode('utf-8')
-      print(f"*** {output=}")
+      print(f"*** {url=} {output=}")
       result = json.loads(output)
       return result
 
