@@ -66,7 +66,11 @@ class ScuttleCard(Card):
    def call_scuttle(self, url):
       output = check_output([SCUTTLE_BIN, '--json', url]).decode('utf-8')
       print(f"*** {url=} {output=}")
-      result = json.loads(output)
+      try:
+         result = json.loads(output)
+      except:
+         print(f"*** [ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE")
+         raise
       return result
 
    def decode_scuttle_output(self, data):
