@@ -1,0 +1,13 @@
+<button class="accordion">Guide</button>
+<div class="panel">
+  <h2>Via-API Manager Guide</h2>
+  <p>Via-API Manager is</p>
+  <ol>
+    <li>Select name of the model you want to load via-api</li>
+    <li>Click the "Load Model" button.</li>
+  </ol>
+  <h2>Tips</h2>
+  <ul>
+    <li>If the model is too large, it might not load correctly.</li>
+  </ul>
+</panel>
