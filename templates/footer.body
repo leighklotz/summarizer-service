@@ -1,4 +1,4 @@
 <hr />
 <footer>
-<a href="{{stats.openapi_ui_server}}">{{stats.model_name}}</a> / {{stats.nvfree}} free <a href="https://github.com/leighklotz/summarizer-service">source</a>
+<a href="{{stats.model_link}}">{{stats.model_name}}</a> / {{stats.nvfree}} free <a href="https://github.com/leighklotz/summarizer-service">source</a>
 </footer>

@@ -20,10 +20,18 @@ class Card:
       # Fetch stats from the system
       nvfree = (check_output([NVFREE_BIN]).decode('utf-8') or "0").strip()
       MODEL_TYPE=os.environ.get('MODEL_TYPE', 'Mistral')
-      model_name = (check_output([VIA_API_BIN, '--get-model-name']).decode('utf-8') or f"{MODEL_TYPE}?").strip()
-      stats = {'nvfree': nvfree, 'model_name': model_name, 'openapi_ui_server': OPENAPI_UI_SERVER}
-      return stats
+      model_name = None
 
+      if MODEL_TYPE == "via-api":
+         model_name = ((check_output([VIA_API_BIN, '--get-model-name']).decode('utf-8') or "").strip())
+         model_link = OPENAPI_UI_SERVER
+
+      if not model_name:
+         model_name = f"{MODEL_TYPE}?"
+         model_link = LLAMAFILES_LINK
+
+      stats = {'nvfree': nvfree, 'model_name': model_name, 'model_link': model_link }
+      return stats
 
 class HomeCard(Card):
    def __init__(self):
