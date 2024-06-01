@@ -101,6 +101,32 @@ class ScuttleCard(Card):
       else:
          raise ValueError("Not a string or list of strings", keywords)
 
+class ViaAPIModelCard(Card):
+   LOAD_MODEL_FLAG = '--load-model'
+   LIST_MODELS_FLAG = '--list-models'
+
+   def __init__(self):
+      self.stats = self.get_stats()
+      self.model_name = None
+
+   def get_models_list(self):
+      # use shell via-api.sh to get the newline separated list of model names into an array of strings
+      models_list = check_output([VIA_API_BIN, self.LIST_MODELS_FLAG]).decode('utf-8').split('\n')
+      models_list = [ model_name.strip() for model_name in models_list ]
+      return models_list
+
+   def get_template(self):
+      data = { 'models_list': self.get_models_list(), 'output': '' }
+      return render_template("cards/via-api-model/index.page", data=data, stats=self.stats)
+
+   def process(self):
+      if self.model_name:
+         # Summarize the text from the URL using the provided prompt
+         output = check_output([VIA_API_BIN,
+                                self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
+         data = { 'models_list': self.get_models_list(), 'output': output }
+         return render_template("cards/via-api-model/index.page", data=data, stats=self.stats)          
+
 # Rest of the code remains the same. Here's the example of how you can use the cards:
 
 @app.route("/")
@@ -125,6 +151,15 @@ def summarize_for_scuttle():
    card = ScuttleCard()
    if request.method == "POST":
        card.url = request.form.get('url')
+       return card.process()
+   else:
+      return card.get_template()
+
+@app.route("/via-api-model", methods=["GET", "POST"])
+def via_api_model():
+   card = ViaAPIModelCard()
+   if request.method == "POST":
+       card.model_name = request.form.get('model_name')
        return card.process()
    else:
       return card.get_template()

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Via-API Model Manager</title>
+    {% include('header.body') %}
+  </head>
+  <body>
+    {% include('nav.body') %}
+    <main>
+      <h1>Via-API Model Manager</h1>
+      <form method="POST">
+        <div id="grid">
+          <label for="model_name">Model Name:</label>
+	  <select id="model_name" name="model_name">
+	    {% for model_name in data.models_list %}
+	     <option value="{{model_name}}" {% if data.model_name == model_name %}selected{% endif %}>{{model_name}}</option>
+	    {% endfor %}
+	  </select>
+	  </div>
+	<button type="submit" id="submit-button">Load Model</button>
+	<div id="loading"></div>
+      </form>
+      <hr />
+      {% include('cards/via-api-model/help.body') %}
+    </main>
+    <div class="accordion">
+    {% include('footer.body') %}
+    </div>
+  </body>
+</html>
