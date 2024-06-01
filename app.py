@@ -3,6 +3,7 @@
 # Copyright 2024 Leigh Klotz
 # A web application that provides LLM-based text web page summarization for bookmarking services using Flask, subprocesses, and custom scripts.
 
+import os
 from flask import Flask, request, redirect, render_template, jsonify
 from subprocess import check_output
 import json
@@ -18,7 +19,8 @@ class Card:
    def get_stats(self):
       # Fetch stats from the system
       nvfree = (check_output([NVFREE_BIN]).decode('utf-8') or "0").strip()
-      model_name = (check_output([VIA_API_BIN, '--get-model-name']).decode('utf-8') or "Mistral?").strip()
+      MODEL_TYPE=os.environ.get('MODEL_TYPE', 'Mistral')
+      model_name = (check_output([VIA_API_BIN, '--get-model-name']).decode('utf-8') or f"{MODEL_TYPE}?").strip()
       stats = {'nvfree': nvfree, 'model_name': model_name, 'openapi_ui_server': OPENAPI_UI_SERVER}
       return stats
 
