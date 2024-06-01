@@ -1,7 +1,13 @@
+
+
+
 # Summarizer Service
+A web application that provides LLM-based text web page summarization for bookmarking services using Flask, subprocesses, and custom scripts.
 
 Summarizer Service is a bare-bones sample Flask web application using Flask, using subprocesses and custom scripts.
 The application provides text web page summarization for bookmarking services, accepting both GET and POST requests with or without a custom prompt.
+
+Copyright 2024 Leigh Klotz
 
 ## Example
 
