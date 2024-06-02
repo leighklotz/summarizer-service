@@ -118,8 +118,8 @@ class ViaAPIModelCard(Card):
 
    def get_model_name(self):
       # use shell via-api.sh to get loaded model name as a stirng
-      models_name = check_output([VIA_API_BIN, self.GET_MODEL_NAME_FLAG]).decode('utf-8').strip()
-      return models_name
+      model_name = check_output([VIA_API_BIN, self.GET_MODEL_NAME_FLAG]).decode('utf-8').strip()
+      return model_name
 
    def get_template(self):
       data = self.get_data()
