@@ -12,8 +12,8 @@
         <div id="grid">
           <label for="model_name">Model Name:</label>
 	  <select id="model_name" name="model_name">
-	    {% for model_name in data.models_list %}
-	     <option value="{{model_name}}" {% if data.model_name == model_name %}selected{% endif %}>{{model_name}}</option>
+	    {% for model_name in card.models_list %}
+	     <option value="{{model_name}}" {% if model_name == card.model_name %}selected{% endif %}>{{model_name}}</option>
 	    {% endfor %}
 	  </select>
 	  </div>
@@ -22,7 +22,7 @@
       </form>
       <hr />
       <div>
-        {% for para in data.output.split('\n') %}
+        {% for para in card.output.split('\n') %}
         <p>{{para}}</p>
         {% endfor %}
       </div>

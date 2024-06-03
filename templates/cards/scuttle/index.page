@@ -11,7 +11,7 @@
       <form method="POST">
         <div id="grid">
 	  <label for="url">Enter URL:</label>
-	  <input type="url" id="url" name="url" required>
+	  <input type="url" id="url" name="url" required value="{{card.url}}">
 	</div>
 	<button type="submit" id="submit-button">Scuttle</button>
 	<div id="loading"></div>

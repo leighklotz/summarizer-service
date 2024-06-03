@@ -11,16 +11,16 @@
       <form method="POST">
         <div id="grid">
           <label for="url">Enter URL:</label>
-          <input type="url" id="url" name="url" value="{{data.url}}" required>
+          <input type="url" id="url" name="url" value="{{card.url}}" required>
           <label for="prompt">Optional Prompt:</label>
-          <input type="text" id="prompt" name="prompt" value="{{data.prompt}}" list="prompts" />
+          <input type="text" id="prompt" name="prompt" value="{{card.prompt}}" list="prompts" />
           <button type="submit" id="submit-button">Summarize</button>
 	  <div id="loading"></div>
         </div>
       </form>
       <hr />
       <div>
-        {% for para in data.summary.split('\n') %}
+        {% for para in card.summary.split('\n') %}
         <p>{{para}}</p>
         {% endfor %}
       </div>
