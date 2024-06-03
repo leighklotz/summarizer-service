@@ -16,6 +16,10 @@ class Card:
    def __init__(self):
        self.stats = self.get_stats()
 
+   def render_template(self, template_name, **kwargs):
+      self.stats = self.get_stats()
+      return render_template(template_name, stats=self.stats, **kwargs)
+
    def get_stats(self):
       # Fetch stats from the system
       nvfree = (check_output([NVFREE_BIN]).decode('utf-8') or "0").strip()
@@ -23,7 +27,8 @@ class Card:
       model_name = None
 
       if MODEL_TYPE == "via-api":
-         model_name = ((check_output([VIA_API_BIN, '--get-model-name']).decode('utf-8') or "").strip())
+         model_name = ((check_output([VIA_API_BIN, GET_MODEL_NAME_FLAG]).decode('utf-8') or "").strip())
+         print(f"*** get_stats {model_name=}")
          model_link = OPENAPI_UI_SERVER
 
       if not model_name:
@@ -38,7 +43,7 @@ class HomeCard(Card):
        super().__init__()
 
    def get_template(self):
-       return render_template("cards/home/index.page", stats=self.stats)
+      return super().render_template("cards/home/index.page")
 
 class SummarizeCard(Card):
    def __init__(self, url=None, prompt='Summarize'):
@@ -47,9 +52,11 @@ class SummarizeCard(Card):
        self.prompt = prompt
        self.summary = ''
 
+   def get_data(self):
+      return { 'url': self.url, 'prompt': self.prompt, 'summary': self.summary }
+
    def get_template(self):
-       data = {'url': self.url, 'prompt': self.prompt, 'summary': self.summary}
-       return render_template("cards/summarize/index.page", data=data, stats=self.stats)
+      return super().render_template("cards/summarize/index.page", **data)
 
    def process(self):
        if self.url:
@@ -64,7 +71,7 @@ class ScuttleCard(Card):
        self.scuttle_url = None
 
    def get_template(self):
-       return render_template("cards/scuttle/index.page", data={}, stats=self.stats)
+       return super().render_template("cards/scuttle/index.page")
 
    def process(self):
        if self.url:
@@ -104,11 +111,9 @@ class ScuttleCard(Card):
 class ViaAPIModelCard(Card):
    LOAD_MODEL_FLAG = '--load-model'
    LIST_MODELS_FLAG = '--list-models'
-   GET_MODEL_NAME_FLAG = '--get-model-name'
 
    def __init__(self):
-      self.stats = self.get_stats()
-      self.model_name = self.get_model_name()
+      super().__init__()
 
    def get_models_list(self):
       # use shell via-api.sh to get the newline separated list of model names into an array of strings
@@ -116,17 +121,12 @@ class ViaAPIModelCard(Card):
       models_list = [ model_name.strip() for model_name in models_list ]
       return models_list
 
-   def get_model_name(self):
-      # use shell via-api.sh to get loaded model name as a stirng
-      model_name = check_output([VIA_API_BIN, self.GET_MODEL_NAME_FLAG]).decode('utf-8').strip()
-      return model_name
-
    def get_template(self):
       data = self.get_data()
-      return render_template("cards/via-api-model/index.page", data=data, stats=self.stats)
+      return super().render_template("cards/via-api-model/index.page", data=data)
 
    def get_data(self, output=''):
-      data = { 'models_list': self.get_models_list(), 'output': output, 'model_name': self.model_name }
+      data = { 'models_list': self.get_models_list(), 'output': output }
       return data
 
    def process(self):
@@ -134,7 +134,7 @@ class ViaAPIModelCard(Card):
          # Summarize the text from the URL using the provided prompt
          output = check_output([VIA_API_BIN, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
          data = self.get_data(output=output)
-         return render_template("cards/via-api-model/index.page", data=data, stats=self.stats)
+         return self.template()
 
 # Rest of the code remains the same. Here's the example of how you can use the cards:
 
