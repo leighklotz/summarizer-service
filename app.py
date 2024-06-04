@@ -13,8 +13,9 @@ from config import *
 app = Flask(__name__)
 
 class BaseCard:
-   def __init__(self, template):
+   def __init__(self, template, params):
        self.template = template
+       self.params = params
        self.stats = self.get_stats()
 
    def get_template(self):
@@ -24,6 +25,8 @@ class BaseCard:
        raise NotImplementedError
 
    def get_model_info(self):
+      # todo: run llamafiles/env.sh first
+      # or use via-cli + via-api to run this
       model_type=os.environ.get('MODEL_TYPE', DEFAULT_MODEL_TYPE)
       model_name = ''
       model_link = ''
@@ -47,11 +50,11 @@ class BaseCard:
 
 class HomeCard(BaseCard):
    def __init__(self):
-       super().__init__(template='cards/home/index.page')
+       super().__init__(template='cards/home/index.page', params=[])
 
 class SummarizeCard(BaseCard):
    def __init__(self):
-      super().__init__(template='cards/summarize/index.page')
+      super().__init__(template='cards/summarize/index.page', params=['url', 'prompt'])
       self.url = ''
       self.prompt = 'Summarize'
       self.summary = ''
@@ -65,7 +68,7 @@ class SummarizeCard(BaseCard):
 
 class ScuttleCard(BaseCard):
    def __init__(self):
-      super().__init__(template='cards/scuttle/index.page')
+      super().__init__(template='cards/scuttle/index.page', params=['url'])
       self.url = ''
 
    def process(self):
@@ -112,10 +115,10 @@ class ViaAPIModelCard(BaseCard):
    LIST_MODELS_FLAG = '--list-models'
 
    def __init__(self):
-      super().__init__(template='cards/via-api-model/index.page')
+      super().__init__(template='cards/via-api-model/index.page', params=['model_name', 'output'])
       self.model_name = ''
-      self.models_list = self.get_models_list()
       self.output = ''
+      self.models_list = self.get_models_list()
 
    def get_models_list(self):
       # use shell via-api.sh to get the newline separated list of model names into an array of strings
@@ -128,9 +131,9 @@ class ViaAPIModelCard(BaseCard):
          self.output = check_output([VIA_API_BIN, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
       return self.get_template()
 
-def card_router(card_constructor, params):
+def card_router(card_constructor):
    card = card_constructor()
-   for param in params:
+   for param in card.params:
       setattr(card, param, request.args.get(param, request.form.get(param, '')))
       if request.method == "POST":
          card.process()
@@ -138,19 +141,19 @@ def card_router(card_constructor, params):
    
 @app.route("/")
 def home():
-   return card_router(HomeCard, [])
+   return card_router(HomeCard)
 
 @app.route("/summarize", methods=["GET", "POST"])
 def summarize_with_prompt():
-   return card_router(SummarizeCard, ['url', 'prompt'])
+   return card_router(SummarizeCard)
 
 @app.route("/scuttle", methods=["GET", "POST"])
 def summarize_for_scuttle():
-   return card_router(ScuttleCard, ['url'])
+   return card_router(ScuttleCard)
 
 @app.route("/via-api-model", methods=["GET", "POST"])
 def via_api_model():
-   return card_router(ViaAPIModelCard, ['model_name'])
+   return card_router(ViaAPIModelCard)
 
 if __name__ == "__main__":
    app.run(host=LISTEN_HOST, port=PORT)
