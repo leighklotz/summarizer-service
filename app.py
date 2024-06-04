@@ -136,7 +136,8 @@ def card_router(card_constructor):
    for param in card.params:
       setattr(card, param, request.args.get(param, request.form.get(param, '')))
       if request.method == "POST":
-         card.process()
+         result = card.process()
+         if result is not None: return result
    return card.get_template()
    
 @app.route("/")
