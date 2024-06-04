@@ -8,6 +8,11 @@
       <li>Click the "<strong>Summarize</strong>" button to initiate the summarization process.</li>
       <li>The application will then generate a concise summary of the article, which will be displayed in the three text boxes below the input fields.</li>
     </ol>
+    <h2>Bookmarklet</h2>
+    <ul>
+    <li>Copy this link and add to your browser bookmarks tab</li>
+    <li><a href="javascript:(  function() {    var x = document;    var a = encodeURIComponent(x.location.href);    var d = encodeURIComponent(window.getSelection());    open('http://tensor-psy.klotz.me:8080/summarize?url=%27%20+%20a%20+%20%27&prompt=%27%20+%20d,%20%27Summarize20-%20klotz.me%27,%20%27modal=1,status=0,scrollbars=1,toolbar=0,resizable=1,width=790,height=465,left=%27%20+%20(screen.width-790)/2%20+%20%27,top=%27%20+%20(screen.height-425)/2);%20%20})();">Summarize</a></li>
+    </ul>
     <p>Enjoy the convenience of quickly digesting long articles with our Article Summarizer!</p>
   </div>
 </div>
