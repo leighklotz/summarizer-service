@@ -1,3 +1,6 @@
+DEFAULT_MODEL_TYPE='Mistral'
+LISTEN_HOST='0.0.0.0'
+PORT=8080
 SCUTTLE_BIN="/home/klotz/wip/llamafiles/scripts/scuttle.sh"
 SUMMARIZE_BIN="/home/klotz/wip/llamafiles/scripts/summarize.sh"
 NVFREE_BIN="/home/klotz/wip/llamafiles/scripts/nvfree.sh"
