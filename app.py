@@ -80,7 +80,7 @@ class ScuttleCard(BaseCard):
    def process(self):
       if self.url:
          if not (self.url.startswith('http://') or self.url.startswith('https://')):
-            raise ValueError("Unsupported URL type", url)
+            raise ValueError("Unsupported URL type", self.url)
          scuttle_url = self.decode_scuttle_output(self.call_scuttle(self.url))
          return redirect(scuttle_url)
       else:
