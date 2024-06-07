@@ -5,7 +5,7 @@
 
 import os
 from flask import Flask, request, redirect, render_template, jsonify
-from subprocess import check_output
+from subprocess import check_output, CalledProcessError
 import json
 import urllib.parse
 from config import *
@@ -13,6 +13,8 @@ from config import *
 app = Flask(__name__)
 
 class BaseCard:
+   GET_MODEL_NAME_FLAG = '--get-model-name'
+
    def __init__(self, template, params):
        self.template = template
        self.params = params
@@ -31,15 +33,19 @@ class BaseCard:
       model_name = ''
       model_link = ''
       if model_type == "via-api":
-         model_name = (check_output([VIA_API_BIN, GET_MODEL_NAME_FLAG]).decode('utf-8') or "").strip()
+         model_name = (check_output([VIA_API_BIN, self.GET_MODEL_NAME_FLAG]).decode('utf-8') or "").strip()
          model_link = OPENAPI_UI_SERVER
       if not model_name:
          model_name = f"{model_type}?"
          model_link = LLAMAFILES_LINK
-         return (model_type, model_name, model_link)
+      return (model_type, model_name, model_link)
 
    def get_nvfree(self):
-      return (check_output([NVFREE_BIN]).decode('utf-8') or "0").strip()
+      try:
+         return (check_output([NVFREE_BIN]).decode('utf-8') or "0").strip()
+      except subprocess.CalledProcessError:
+         return "0"
+      
 
    def get_stats(self):
       # Fetch stats from the system
