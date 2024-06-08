@@ -1,0 +1,22 @@
+<button class="accordion">Guide</button>
+<div class="panel">
+  <h2>Scuttle Summarizer Guide</h2>
+  <p>Scuttle Summarizer is a web-based tool that helps users to summarize articles or web pages quickly. Here's a step-by-step guide on how to use it:</p>
+  <ol>
+    <li>Enter the URL of the web page you want to summarize in the "Enter URL" box.</li>
+    <li>Click the "Scuttle" button.</li>
+    <li>You will be redirected to the Scuttle site with the title, description, and keywords suggested.</li>
+    <li>Edit or submit the resulting Scuttle page.</li>
+  </ol>
+  <h2>Tips</h2>
+  <ul>
+    <li>Ensure the entered URL is correct and points to a valid web page.</li>
+    <li>If the page is too large, the summarizer might not work correctly.</li>
+  </ul>
+  <h2>Bookmarklet</h2>
+  <ul>
+  <li>Copy this link and add to your browser bookmarks tab</li>
+  <li><a href="javascript:(  function() {    var x = document;    var a = encodeURIComponent(x.location.href);    var d = encodeURIComponent(window.getSelection());    open('http://tensor-psy.klotz.me:8080/scuttle?url=%27%20+%20a%20+%20%27&prompt=%27%20+%20d,%20%27SemanticScuttle%20-%20klotz.me%27,%20%27modal=1,status=0,scrollbars=1,toolbar=0,resizable=1,width=790,height=465,left=%27%20+%20(screen.width-790)/2%20+%20%27,top=%27%20+%20(screen.height-425)/2);%20%20})();">Scuttle</a></li>
+  </ul>
+  <p>Happy summarizing with Scuttle Summarizer!</p>
+</panel>

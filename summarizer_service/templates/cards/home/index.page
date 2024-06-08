@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Summarizer</title>
+  {% include('header.body') %}
+</head>
+<body>
+  {% include('nav.body') %}
+  <main>
+    <p>Pick a service above.</a>
+  </main>
+  {% include('footer.body') %}
+</body>
+</html>

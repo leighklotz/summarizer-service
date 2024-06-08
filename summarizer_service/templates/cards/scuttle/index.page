@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Scuttle Summarizer</title>
+    {% include('header.body') %}
+  </head>
+  <body>
+    {% include('nav.body') %}
+    <main>
+      <h1>Scuttle Summarizer</h1>
+      <form method="POST">
+        <div id="grid">
+	  <label for="url">Enter URL:</label>
+	  <input type="url" id="url" name="url" required value="{{card.url}}">
+	</div>
+	<button type="submit" id="submit-button">Scuttle</button>
+	<div id="loading"></div>
+      </form>
+      <hr />
+      {% include('cards/scuttle/help.body') %}
+    </main>
+    {% include('footer.body') %}
+  </body>
+</html>
