@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Summarizer</title>
+    {% include('header.body') %}
+  </head>
+  <body>
+    {% include('nav.body') %}
+    <main>
+      <h1>Summarizer</h1>
+      <form method="POST">
+        <div id="grid">
+          <label for="url">Enter URL:</label>
+          <input type="url" id="url" name="url" value="{{card.url}}" required>
+          <label for="prompt">Optional Prompt:</label>
+          <input type="text" id="prompt" name="prompt" value="{{card.prompt}}" list="prompts" />
+          <button type="submit" id="submit-button">Summarize</button>
+	  <div id="loading"></div>
+        </div>
+      </form>
+      <hr />
+      <div>
+        {% for para in card.summary.split('\n') %}
+        <p>{{para}}</p>
+        {% endfor %}
+      </div>
+    <datalist id="prompts">
+      <option value="">
+      <option value="Summarize">
+      <option value="Summarize as bullet points" />
+      <option value="Summarize the main points" />
+      <option value="What is unusual about this?" />
+      <option value="Write help text to add to this web page" />
+    </datalist>
+    <div class="accordion">
+      {% include('cards/summarize/help.body') %}
+    </div>
+    </main>
+    {% include('footer.body') %}
+  </body>
+</html>
+

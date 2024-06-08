@@ -14,4 +14,4 @@ if [ ! -d "/tmp/summarizer" ]; then
 fi
 
 # Use double quotes around file name to handle spaces in log file names
-./app.py 2&>1 >> "/tmp/summarizer/${stamp}-$$.log"
+./app.py 2>&1 | tee >> "/tmp/summarizer/${stamp}-$$.log"

@@ -1,0 +1,11 @@
+body { margin-left: 4pt; }
+#grid { 
+    display: grid; 
+    grid-template-columns: auto 1fr; 
+    gap: 10px;
+    align-items: center;
+}
+label, button { font-weight: bold; }
+#url, #prompt { width: 50%; }
+button { grid-column: span 1; margin-top: 10px; }
+
