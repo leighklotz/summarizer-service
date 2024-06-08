@@ -43,7 +43,7 @@ class BaseCard:
    def get_nvfree(self):
       try:
          return (check_output([NVFREE_BIN]).decode('utf-8') or "0").strip()
-      except subprocess.CalledProcessError:
+      except CalledProcessError:
          return "0"
       
 
