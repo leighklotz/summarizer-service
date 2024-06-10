@@ -15,4 +15,4 @@
 ### ${SCRIPT_DIR}/app.py 2>&1 | tee >> "/tmp/summarizer/${stamp}-$$.log"
 ###
 
-gunicorn -b 0.0.0.0:8080 summarizer_service:app
+gunicorn -b 0.0.0.0:8080 --timeout 300 summarizer_service:app
