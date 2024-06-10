@@ -34,7 +34,15 @@ pip install -r requirements.txt
 ```
 
 ### Usage
-1. Run the application using either of the following commands:
+Here are three options
+
+1. Run with gunicorn
+```bash
+$ apt install gunicorn
+$ ./run.sh
+```
+
+2. Run the application with Python
 
 ```bash
 python app.py
