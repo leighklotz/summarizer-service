@@ -8,13 +8,11 @@ from flask import Flask, request, redirect, render_template, jsonify
 from subprocess import check_output, CalledProcessError
 import json
 import urllib.parse
-from config import *
+from .config import *
 
-app = None
+app = Flask(__name__)
 
 def create_app():
-   global app
-   app = Flask(__name__)
    return app
 
 class BaseCard:
@@ -31,32 +29,28 @@ class BaseCard:
    def process(self):
        raise NotImplementedError
 
-   def get_model_info(self):
-      # todo: run llamafiles/env.sh first
-      # or use via-cli + via-api to run this
-      model_type=os.environ.get('MODEL_TYPE', DEFAULT_MODEL_TYPE)
-      model_name = ''
-      model_link = ''
-      if model_type == "via-api":
-         model_name = (check_output([VIA_API_BIN, self.GET_MODEL_NAME_FLAG]).decode('utf-8') or "").strip()
-         model_link = OPENAPI_UI_SERVER
-      if not model_name:
-         model_name = f"{model_type}?"
-         model_link = LLAMAFILES_LINK
-      return (model_type, model_name, model_link)
+   def _get_model_info(self):
+      model_type = os.environ.get('MODEL_TYPE', DEFAULT_MODEL_TYPE)
+      return {
+         "model_type": model_type,
+         "model_name": self._get_via_script(VIA_API_BIN, self.GET_MODEL_NAME_FLAG) or f"{model_type}?",
+         "model_link": self._determine_model_link(model_type)
+      }
 
-   def get_nvfree(self):
+   def _get_via_script(self, script_bin, *args):
       try:
-         return (check_output([NVFREE_BIN]).decode('utf-8') or "0").strip()
+         return (check_output([script_bin] + list(args)).decode('utf-8') or "").strip()
       except CalledProcessError:
-         return "0"
-      
+         return None
+
+   def _determine_model_link(self, model_type):
+      return self.OPENAPI_UI_SERVER if model_type == "via-api" else LLAMAFILES_LINK
 
    def get_stats(self):
-      # Fetch stats from the system
-      nvfree = self.get_nvfree()
-      model_type, model_name, model_link = self.get_model_info()
-      stats = {'nvfree': nvfree, 'model_name': model_name, 'model_link': model_link }
+      nvfree = self._get_via_script(NVFREE_BIN) or "0"
+      stats = {'nvfree': nvfree}
+      model_info = self._get_model_info()
+      stats.update(model_info)
       return stats
 
 class HomeCard(BaseCard):
