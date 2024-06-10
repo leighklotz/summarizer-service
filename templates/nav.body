@@ -1,6 +1,0 @@
-    <nav class="main-header">
-      <a href="/">Home</a>
-      <a href="scuttle">Scuttle</a>
-      <a href="summarize">Summarize</a>
-      <a href="via-api-model">Via API Models</a>
-    </nav>
