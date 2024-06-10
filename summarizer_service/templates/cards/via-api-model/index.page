@@ -13,7 +13,8 @@
           <label for="model_name">Model Name:</label>
 	  <select id="model_name" name="model_name">
 	    {% for model_name in card.models_list %}
-	     <option value="{{model_name}}" {% if model_name == card.model_name %}selected{% endif %}>{{model_name}}</option>
+	    <!-- {{model_name}} == {{card.stats.model_name}} -->
+	     <option value="{{model_name}}" {% if model_name == card.stats.model_name %}selected{% endif %}>{{model_name}}</option>
 	    {% endfor %}
 	  </select>
 	  </div>

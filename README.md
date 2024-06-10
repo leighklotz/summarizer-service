@@ -34,13 +34,14 @@ pip install -r requirements.txt
 ```
 
 ### Usage
-Run the application using either of the following commands:
+1. Run the application using either of the following commands:
 
 ```bash
 python app.py
 
 ```
-or
+
+2. Run with flask CLI
 
 ```bash
 flask run --host 127.0.0.1 --port 8080
@@ -48,10 +49,17 @@ flask run --host 127.0.0.1 --port 8080
 
 The application will be accessible at `http://localhost:8080`.
 
+3. Run with gunicorn, for example as a service.
+
+``bash
+gunicorn -b 0.0.0.0:8080 summarizer_service:app
+```
+
 ### Cards
 - `/`: Home card
 - `/scuttle?url=`: Scuttle bookmarking service card
 - `/summarize?url=&prompt=`: Text summarization with optional prompt card
+- `/via-api-model?model_name=': List models and select current; POST to load.
 
 Cards are implemented in `app.py` and with templates in `templates/cards/cardname`.
 
