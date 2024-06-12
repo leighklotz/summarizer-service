@@ -30,11 +30,13 @@ class BaseCard:
        raise NotImplementedError
 
    def _get_model_info(self):
+      via = os.environ.get('VIA', DEFAULT_VIA)      
       model_type = os.environ.get('MODEL_TYPE', DEFAULT_MODEL_TYPE)
       return {
+         "via": via,
          "model_type": model_type,
-         "model_name": self._get_via_script(VIA_API_BIN, self.GET_MODEL_NAME_FLAG) or f"{model_type}?",
-         "model_link": self._determine_model_link(model_type)
+         "model_name": self._get_via_script(VIA_API_BIN, via, self.GET_MODEL_NAME_FLAG) or f"{model_type}?",
+         "model_link": self._determine_model_link(via, model_type)
       }
 
    def _get_via_script(self, script_bin, *args):
@@ -43,8 +45,8 @@ class BaseCard:
       except CalledProcessError:
          return None
 
-   def _determine_model_link(self, model_type):
-      return self.OPENAPI_UI_SERVER if model_type == "via-api" else LLAMAFILES_LINK
+   def _determine_model_link(self, via, model_type):
+      return OPENAPI_UI_SERVER if via == "api" else LLAMAFILES_LINK
 
    def get_stats(self):
       nvfree = self._get_via_script(NVFREE_BIN) or "0"

@@ -1,4 +1,5 @@
 DEFAULT_MODEL_TYPE='Mistral'
+DEFAULT_VIA='api'
 LISTEN_HOST='0.0.0.0'
 PORT=8080
 SCUTTLE_BIN="/home/klotz/wip/llamafiles/scripts/scuttle.sh"

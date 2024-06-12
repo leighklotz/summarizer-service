@@ -1,4 +1,4 @@
 <hr />
 <footer>
-<a href="{{card.stats.model_link}}">{{card.stats.model_name}}</a> / {{card.stats.nvfree}} free <a href="https://github.com/leighklotz/summarizer-service">source</a>
+<a href="{{card.stats.model_link}}">{{card.stats.model_name}}</a> via {{card.stats.via}} / {{card.stats.nvfree}} free <a href="https://github.com/leighklotz/summarizer-service">source</a>
 </footer>
