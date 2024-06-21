@@ -37,7 +37,7 @@ class BaseCard:
       return {
          'via': via,
          'model_type': model_type,
-         'model_name': self._get_via_script(self.VIA_BIN, self.VIA_FLAG, via, self.GET_MODEL_NAME_FLAG) or f"{model_type}?",
+         'model_name': self._get_via_script(VIA_BIN, self.VIA_FLAG, via, self.GET_MODEL_NAME_FLAG) or f"{model_type}?",
          'model_link': self._determine_model_link(via, model_type)
       }
 
@@ -131,13 +131,13 @@ class ViaAPIModelCard(BaseCard):
 
    def get_models_list(self):
       # use shell via --api to get the newline separated list of model names into an array of strings
-      models_list = check_output([self.VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LIST_MODELS_FLAG]).decode('utf-8').split('\n')
+      models_list = check_output([VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LIST_MODELS_FLAG]).decode('utf-8').split('\n')
       models_list = [ model_name.strip() for model_name in models_list ]
       return models_list
 
    def process(self):
       if self.model_name:
-         self.output = check_output([self.VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
+         self.output = check_output([VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
       return self.get_template()
 
 def card_router(card_constructor):
