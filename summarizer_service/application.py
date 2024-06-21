@@ -16,6 +16,8 @@ def create_app():
    return app
 
 class BaseCard:
+   VIA_FLAG = '--via'
+   API_FLAG = 'api'
    GET_MODEL_NAME_FLAG = '--get-model-name'
 
    def __init__(self, template, params):
@@ -30,13 +32,13 @@ class BaseCard:
        raise NotImplementedError
 
    def _get_model_info(self):
-      via = os.environ.get('VIA', DEFAULT_VIA)      
+      via = os.environ.get('VIA', DEFAULT_VIA)
       model_type = os.environ.get('MODEL_TYPE', DEFAULT_MODEL_TYPE)
       return {
-         "via": via,
-         "model_type": model_type,
-         "model_name": self._get_via_script(VIA_API_BIN, via, self.GET_MODEL_NAME_FLAG) or f"{model_type}?",
-         "model_link": self._determine_model_link(via, model_type)
+         'via': via,
+         'model_type': model_type,
+         'model_name': self._get_via_script(VIA_BIN, VIA_FLAG, via, self.GET_MODEL_NAME_FLAG) or f"{model_type}?",
+         'model_link': self._determine_model_link(via, model_type)
       }
 
    def _get_via_script(self, script_bin, *args):
@@ -128,14 +130,14 @@ class ViaAPIModelCard(BaseCard):
       self.models_list = self.get_models_list()
 
    def get_models_list(self):
-      # use shell via-api.sh to get the newline separated list of model names into an array of strings
-      models_list = check_output([VIA_API_BIN, self.LIST_MODELS_FLAG]).decode('utf-8').split('\n')
+      # use shell via --api to get the newline separated list of model names into an array of strings
+      models_list = check_output([VIA_BIN, VIA_FLAG, API_FLAG, self.LIST_MODELS_FLAG]).decode('utf-8').split('\n')
       models_list = [ model_name.strip() for model_name in models_list ]
       return models_list
 
    def process(self):
       if self.model_name:
-         self.output = check_output([VIA_API_BIN, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
+         self.output = check_output([VIA_BIN, VIA_FLAG, API_FLAG, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
       return self.get_template()
 
 def card_router(card_constructor):
