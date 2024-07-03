@@ -4,7 +4,7 @@
 # A web application that provides LLM-based text web page summarization for bookmarking services using Flask, subprocesses, and custom scripts.
 
 import os
-from flask import Flask, request, redirect, render_template, jsonify
+from flask import Flask, request, redirect, render_template, jsonify, url_for
 from subprocess import check_output, CalledProcessError
 import json
 import urllib.parse
@@ -151,19 +151,33 @@ def card_router(card_constructor):
    
 @app.route("/")
 def home():
+   return redirect(url_for('home_card'))
+
+@app.route("/card/home")
+def home_card():
    return card_router(HomeCard)
 
-@app.route("/summarize", methods=["GET", "POST"])
+@app.route("/card/summarize", methods=["GET", "POST"])
 def summarize_with_prompt():
    return card_router(SummarizeCard)
 
-@app.route("/scuttle", methods=["GET", "POST"])
+@app.route("/card/scuttle", methods=["GET", "POST"])
 def summarize_for_scuttle():
    return card_router(ScuttleCard)
 
-@app.route("/via-api-model", methods=["GET", "POST"])
+@app.route("/card/via-api-model", methods=["GET", "POST"])
 def via_api_model():
    return card_router(ViaAPIModelCard)
+
+# deprecated
+@app.route("/scuttle")
+def old_scuttle():
+   return redirect(url_for('summarize_for_scuttle'))
+
+@app.route("/summarize")
+def old_scuttle():
+   return redirect(url_for('summarize_with_prompt'))
+
 
 def main():
    app.run(host=LISTEN_HOST, port=PORT)
