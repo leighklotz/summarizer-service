@@ -7,7 +7,7 @@
 <body>
   {% include('nav.body') %}
   <main>
-    <p>Pick a service above.</a>
+    <p>Pick a card above.</a>
   </main>
   {% include('footer.body') %}
 </body>

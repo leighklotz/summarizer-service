@@ -61,6 +61,10 @@ class HomeCard(BaseCard):
    def __init__(self):
        super().__init__(template='cards/home/index.page', params=[])
 
+class ErrorCard(BaseCard):
+   def __init__(self):
+       super().__init__(template='cards/error/index.page', params=[])
+
 class SummarizeCard(BaseCard):
    def __init__(self):
       super().__init__(template='cards/summarize/index.page', params=['url', 'prompt'])
@@ -142,8 +146,10 @@ class ViaAPIModelCard(BaseCard):
 
 @app.route("/")
 def home():
-   return redirect(url_for('home_card'))
+   # todo: how can we obtain this with url_for('rout_card') + 'home'
+   return redirect('/card/home')
 
+### Cards
 def card_router(card_constructor):
    card = card_constructor()
    for param in card.params:
@@ -153,30 +159,27 @@ def card_router(card_constructor):
       if result is not None: return result
    return card.get_template()
    
-@app.route("/card/home")
-def home_card():
-   return card_router(HomeCard)
+CARDS = {
+   'home': HomeCard,
+   'summarize': SummarizeCard,
+   'scuttle': ScuttleCard,
+   'via-api-model': ViaAPIModelCard,
+   'error': ErrorCard
+}
 
-@app.route("/card/summarize", methods=["GET", "POST"])
-def summarize_with_prompt():
-   return card_router(SummarizeCard)
-
-@app.route("/card/scuttle", methods=["GET", "POST"])
-def summarize_for_scuttle():
-   return card_router(ScuttleCard)
-
-@app.route("/card/via-api-model", methods=["GET", "POST"])
-def via_api_model():
-   return card_router(ViaAPIModelCard)
+@app.route("/card/<card>", methods=["GET", "POST"])
+def route_card(card):
+   return card_router(CARDS.get(card, ErrorCard))
 
 # deprecated
 @app.route("/scuttle", methods=["GET", "POST"])
 def old_scuttle():
-   return redirect(url_for('summarize_for_scuttle'))
+   return redirect("/card/scuttle")
 
+# deprecated
 @app.route("/summarize", methods=["GET", "POST"])
 def old_summarize():
-   return redirect(url_for('summarize_with_prompt'))
+   return redirect("/card/summarize")
 
 
 def main():
