@@ -140,6 +140,10 @@ class ViaAPIModelCard(BaseCard):
          self.output = check_output([VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
       return self.get_template()
 
+@app.route("/")
+def home():
+   return redirect(url_for('home_card'))
+
 def card_router(card_constructor):
    card = card_constructor()
    for param in card.params:
@@ -149,10 +153,6 @@ def card_router(card_constructor):
       if result is not None: return result
    return card.get_template()
    
-@app.route("/")
-def home():
-   return redirect(url_for('home_card'))
-
 @app.route("/card/home")
 def home_card():
    return card_router(HomeCard)
