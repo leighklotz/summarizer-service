@@ -170,12 +170,12 @@ def via_api_model():
    return card_router(ViaAPIModelCard)
 
 # deprecated
-@app.route("/scuttle")
+@app.route("/scuttle", methods=["GET", "POST"])
 def old_scuttle():
    return redirect(url_for('summarize_for_scuttle'))
 
-@app.route("/summarize")
-def old_scuttle():
+@app.route("/summarize", methods=["GET", "POST"])
+def old_summarize():
    return redirect(url_for('summarize_with_prompt'))
 
 
