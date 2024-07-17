@@ -2,14 +2,17 @@
 {% block title %}Scuttle Summarizer{% endblock %}
 {% block h1 %}Scuttle Summarizer{% endblock %}
 {% block content %}
-  <form method="POST">
-    <div id="grid">
-      <label for="url">Enter URL:</label>
-      <input type="url" id="url" name="url" required value="{{card.url}}">
-    </div>
-    <button type="submit" id="submit-button">Scuttle</button>
-    <div id="loading"></div>
-  </form>
+
+<form method="POST">
+  <div id="grid">
+    {% for field in card.form %}
+      <label for="{{ field['name'] }}">{{ field['label'] }}</label>
+      <input {% for attr in field.items() %}{{attr[0]}}="{{attr[1]}}"{% endfor %} />
+    {% endfor %}
+  </div>
+  <button type="submit" id="submit-button">Scuttle</button>
+  <div id="loading"></div>
+</form>
 {% endblock %}
 {% block helpbody %}
   {% include('cards/scuttle/help.body') %}

@@ -24,6 +24,7 @@ class BaseCard:
        self.template = template
        self.params = params
        self.stats = self.get_stats()
+       self.form = []
 
    def get_template(self):
       return render_template(self.template, card=self)
@@ -60,17 +61,22 @@ class BaseCard:
 class HomeCard(BaseCard):
    def __init__(self):
        super().__init__(template='cards/home/index.page', params=[])
+       self.form = []
 
 class ErrorCard(BaseCard):
    def __init__(self):
        super().__init__(template='cards/error/index.page', params=[])
+       self.form = []
 
 class SummarizeCard(BaseCard):
    def __init__(self):
       super().__init__(template='cards/summarize/index.page', params=['url', 'prompt'])
       self.url = ''
       self.prompt = 'Summarize'
-      self.summary = ''
+      self.summary = '' 
+      self.form = [ { 'name':"url", 'label':"Enter URL:", 'type':"url", 'required':"required" }, 
+                    { 'name':"prompt", 'label':"prompt:", 'type':"text", 'list':"prompts" } ]                    
+
 
    def process(self):
       if self.url:
@@ -83,6 +89,7 @@ class ScuttleCard(BaseCard):
    def __init__(self):
       super().__init__(template='cards/scuttle/index.page', params=['url'])
       self.url = ''
+      self.form = [ { 'name':"url", 'label':"URL:", 'type':"url", 'required':"required" } ]
 
    def process(self):
       if self.url:
