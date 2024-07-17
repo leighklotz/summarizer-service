@@ -6,9 +6,11 @@
 </head>
 <body>
   {% include('nav.body') %}
-  <main>
-    <p>Pick a card above.</a>
-  </main>
+  {% block content %}
+    <main>
+      <p>Pick a card above.</a>
+    </main>
+  {% endblock %}
   {% include('footer.body') %}
 </body>
 </html>
