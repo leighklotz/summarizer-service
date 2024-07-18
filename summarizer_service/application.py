@@ -29,7 +29,7 @@ class BaseCard:
    API_FLAG = 'api'
    GET_MODEL_NAME_FLAG = '--get-model-name'
 
-   def __init__(self, template, params):
+   def __init__(self, template, params=[]):
        self.template = template
        self.params = params
        self.stats = self.get_stats()
@@ -181,11 +181,11 @@ class ViaAPIModelCard(BaseCard):
 
 class HomeCard(BaseCard):
    def __init__(self):
-       super().__init__(template='cards/home/index.page', params=[])
+       super().__init__(template='cards/home/index.page')
 
 class ErrorCard(BaseCard):
    def __init__(self):
-       super().__init__(template='cards/error/index.page', params=[])
+       super().__init__(template='cards/error/index.page')
 
 ### Card Routing
 def card_router(card_constructor):
