@@ -1,0 +1,13 @@
+<button class="accordion">Guide</button>
+<div class="panel">
+  <h2>Error</h2>
+  <p>You have reached a card that is not available.
+  <ol>
+    <li>Clock on Home
+    <li>Try Operation again.
+  </ol>
+  <h2>Tips</h2>
+  <ul>
+    <li>Ensure the entered URL is correct and points to a valid web page.</li>
+  </ul>
+</panel>

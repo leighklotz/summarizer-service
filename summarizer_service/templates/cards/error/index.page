@@ -1,0 +1,9 @@
+{% extends "cards/card-base.page" %}
+{% block title %}Error: Unknown Card{% endblock %}
+{% block h1 %}Error: Unknown card{% endblock %}
+{% block content %}
+  <p>Unknown card: pick a card above.</a>
+{% endblock %}
+{% block helpbody %}
+  {% include('cards/error/help.body') %}
+{% endblock %}

@@ -6,6 +6,6 @@ body { margin-left: 4pt; }
     align-items: center;
 }
 label, button { font-weight: bold; }
-#url, #prompt { width: 50%; }
+#grid input { width: 50%; }
 button { grid-column: span 1; margin-top: 10px; }
 

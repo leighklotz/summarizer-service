@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Summarizer</title>
+  <title>{% block title %}Summarizer{% endblock %}</title>
   {% include('header.body') %}
 </head>
 <body>
   {% include('nav.body') %}
-  {% block content %}
-    <main>
+  <main>
+  <h1>{% block h1 %}Summarizer{% endblock %}</h1>
+    {% block content %}
       <p>Pick a card above.</a>
-    </main>
+    {% endblock %}
+  </main>
+  <hr />
+  {% block helpbody %}
   {% endblock %}
   {% include('footer.body') %}
 </body>

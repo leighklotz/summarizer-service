@@ -1,42 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>Summarizer</title>
-    {% include('header.body') %}
-  </head>
-  <body>
-    {% include('nav.body') %}
-    <main>
-      <h1>Summarizer</h1>
-      <form method="POST">
-        <div id="grid">
-          <label for="url">Enter URL:</label>
-          <input type="url" id="url" name="url" value="{{card.url}}" required>
-          <label for="prompt">Optional Prompt:</label>
-          <input type="text" id="prompt" name="prompt" value="{{card.prompt}}" list="prompts" />
-          <button type="submit" id="submit-button">Summarize</button>
-	  <div id="loading"></div>
-        </div>
-      </form>
-      <hr />
-      <div>
-        {% for para in card.summary.split('\n') %}
-        <p>{{para}}</p>
-        {% endfor %}
-      </div>
-    <datalist id="prompts">
-      <option value="">
-      <option value="Summarize">
-      <option value="Summarize as bullet points" />
-      <option value="Summarize the main points" />
-      <option value="What is unusual about this?" />
-      <option value="Write help text to add to this web page" />
-    </datalist>
-    <div class="accordion">
-      {% include('cards/summarize/help.body') %}
+{% extends "cards/card-base.page" %}
+{% block title %}Summarizer{% endblock %}
+{% block h1 %}Summarizer{% endblock %}
+{% block content %}
+<form method="POST">
+  <div id="grid">
+    {% for field in card.form() %}
+      <label for="{{ field['name'] }}">{{ field['label'] }}</label>
+      <input {% for attr in field.items() %}{{attr[0]}}="{{attr[1]}}" {% endfor %} />
+    {% endfor %}
+  </div>
+  <button type="submit" id="submit-button">Summarize</button>
+  <div id="loading"></div>
+</form>
+{%if card.summary %}
+    <hr />
+    <div>
+      {% for para in card.summary.split('\n') %}
+      <p>{{para}}</p>
+      {% endfor %}
     </div>
-    </main>
-    {% include('footer.body') %}
-  </body>
-</html>
-
+{% endif %}
+<datalist id="prompts">
+  <option value="">
+  <option value="Summarize">
+  <option value="Summarize as bullet points" />
+  <option value="Summarize the main points" />
+  <option value="What is unusual about this?" />
+  <option value="Write help text to add to this web page" />
+</datalist>
+{% endblock %}
+{% block helpbody %}
+  {% include('cards/summarize/help.body') %}
+{% endblock %}
