@@ -87,7 +87,7 @@ class URLCard(BaseCard):
       super().pre_process()
       if self.url:
          session['url'] = self.url
-      elif 'url' in session:
+      elif session.get('url', None):
          self.url = session['url']
       if self.url:
          if not (self.url.startswith('http://') or self.url.startswith('https://')):
