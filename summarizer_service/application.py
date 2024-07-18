@@ -183,6 +183,10 @@ class HomeCard(BaseCard):
    def __init__(self):
        super().__init__(template='cards/home/index.page')
 
+   def get_template(self):
+      session['url'] = None
+      return super().get_template()
+
 class ErrorCard(BaseCard):
    def __init__(self):
        super().__init__(template='cards/error/index.page')
