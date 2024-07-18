@@ -4,13 +4,13 @@
 {% block content %}
 <form method="POST">
   <div id="grid">
-    <label for="url">Enter URL:</label>
-    <input type="url" id="url" name="url" value="{{card.url}}" required>
-    <label for="prompt">Optional Prompt:</label>
-    <input type="text" id="prompt" name="prompt" value="{{card.prompt}}" list="prompts" />
-    <button type="submit" id="submit-button">Summarize</button>
-    <div id="loading"></div>
+    {% for field in card.form() %}
+      <label for="{{ field['name'] }}">{{ field['label'] }}</label>
+      <input {% for attr in field.items() %}{{attr[0]}}="{{attr[1]}}" {% endfor %} />
+    {% endfor %}
   </div>
+  <button type="submit" id="submit-button">Summarize</button>
+  <div id="loading"></div>
 </form>
 {%if card.summary %}
     <hr />

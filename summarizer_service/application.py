@@ -1,19 +1,28 @@
 #!/usr/bin/env python3
-
 # Copyright 2024 Leigh Klotz
 # A web application that provides LLM-based text web page summarization for bookmarking services using Flask, subprocesses, and custom scripts.
 
 import os
-from flask import Flask, request, redirect, render_template, jsonify, url_for
+from flask import Flask, request, redirect, render_template, jsonify, url_for, session
 from subprocess import check_output, CalledProcessError
 import json
-import urllib.parse
+import yaml
+import base64
+from urllib.parse import quote_plus
 from .config import *
 
-app = Flask(__name__)
+app = None
 
+### main
 def create_app():
+   global app
+   if app is None:
+      app = Flask(__name__)
+      # todo: preserve this in config between runs
+      app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', os.urandom(24).hex())
    return app
+
+app = create_app()
 
 class BaseCard:
    VIA_FLAG = '--via'
@@ -24,13 +33,19 @@ class BaseCard:
        self.template = template
        self.params = params
        self.stats = self.get_stats()
-       self.form = []
 
    def get_template(self):
       return render_template(self.template, card=self)
 
+   def pre_process(self):
+      for param in self.params:
+         setattr(self, param, request.args.get(param, request.form.get(param, '')))
+
    def process(self):
-       raise NotImplementedError
+      return self.get_template()
+
+   def form(self):
+      return []
 
    def _get_model_info(self):
       via = os.environ.get('VIA', DEFAULT_VIA)
@@ -58,25 +73,40 @@ class BaseCard:
       stats.update(model_info)
       return stats
 
-class HomeCard(BaseCard):
-   def __init__(self):
-       super().__init__(template='cards/home/index.page', params=[])
-       self.form = []
-
-class ErrorCard(BaseCard):
-   def __init__(self):
-       super().__init__(template='cards/error/index.page', params=[])
-       self.form = []
-
-class SummarizeCard(BaseCard):
-   def __init__(self):
-      super().__init__(template='cards/summarize/index.page', params=['url', 'prompt'])
+class URLCard(BaseCard):
+   def __init__(self, template, params=[]):
       self.url = ''
+      super().__init__(template=template, params=(params + ['url']))
+
+   def form(self):
+      return super().form() + [
+         { 'name':"url", 'label':"Enter URL:", 'type':"url", 'required':"required", 'value': self.url }, 
+      ]
+
+   def pre_process(self):
+      super().pre_process()
+      if self.url:
+         session['url'] = self.url
+      elif 'url' in session:
+         self.url = session['url']
+      if self.url:
+         if not (self.url.startswith('http://') or self.url.startswith('https://')):
+            raise ValueError("Unsupported URL type", self.url)
+
+   def process(self):
+      self.summary = check_output([SUMMARIZE_BIN, self.url, self.prompt]).decode('utf-8')
+      return self.get_template()
+                                    
+class SummarizeCard(URLCard):
+   def __init__(self):
+      super().__init__(template='cards/summarize/index.page', params=['prompt'])
       self.prompt = 'Summarize'
       self.summary = '' 
-      self.form = [ { 'name':"url", 'label':"Enter URL:", 'type':"url", 'required':"required" }, 
-                    { 'name':"prompt", 'label':"prompt:", 'type':"text", 'list':"prompts" } ]                    
 
+   def form(self):
+      return super().form() + [
+         { 'name':"prompt", 'label':"Prompt:", 'type':"text", 'list':"prompts" }
+      ]
 
    def process(self):
       if self.url:
@@ -85,17 +115,13 @@ class SummarizeCard(BaseCard):
          self.summary = check_output([SUMMARIZE_BIN, self.url, self.prompt]).decode('utf-8')
       return self.get_template()
 
-class ScuttleCard(BaseCard):
+class ScuttleCard(URLCard):
    def __init__(self):
-      super().__init__(template='cards/scuttle/index.page', params=['url'])
-      self.url = ''
-      self.form = [ { 'name':"url", 'label':"URL:", 'type':"url", 'required':"required" } ]
+      super().__init__(template='cards/scuttle/index.page')
 
    def process(self):
-      if self.url:
-         if not (self.url.startswith('http://') or self.url.startswith('https://')):
-            raise ValueError("Unsupported URL type", self.url)
-         scuttle_url = self.decode_scuttle_output(self.call_scuttle(self.url))
+      scuttle_url = self.decode_scuttle_output(self.call_scuttle(self.url))
+      if scuttle_url:
          return redirect(scuttle_url)
       else:
          return self.get_template()
@@ -118,7 +144,7 @@ class ScuttleCard(BaseCard):
       title = data['title']
       description = data['description']
       tags = self.list_to_comma_separated(data['keywords'])
-      url = f"https://scuttle.klotz.me/bookmarks/klotz?action=add&address={link}&description={urllib.parse.quote(description)}&title={urllib.parse.quote(title)}&tags={tags}"
+      url = f"https://scuttle.klotz.me/bookmarks/klotz?action=add&address={quote_plus(link)}&description={quote_plus(description)}&title={quote_plus(title)}&tags={quote_plus(tags)}"
       return url
 
    def list_to_comma_separated(self, keywords):
@@ -151,20 +177,26 @@ class ViaAPIModelCard(BaseCard):
          self.output = check_output([VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
       return self.get_template()
 
-@app.route("/")
-def home():
-   # todo: how can we obtain this with url_for('rout_card') + 'home'
-   return redirect('/card/home')
+class HomeCard(BaseCard):
+   def __init__(self):
+       super().__init__(template='cards/home/index.page', params=[])
 
-### Cards
+class ErrorCard(BaseCard):
+   def __init__(self):
+       super().__init__(template='cards/error/index.page', params=[])
+
+### Card Routing
 def card_router(card_constructor):
    card = card_constructor()
-   for param in card.params:
-      setattr(card, param, request.args.get(param, request.form.get(param, '')))
+   card.pre_process()
    if request.method == "POST":
       result = card.process()
-      if result is not None: return result
-   return card.get_template()
+      if result is not None:
+         return result
+      else:
+         return card.get_template()
+   else:
+      return card.get_template()
    
 CARDS = {
    'home': HomeCard,
@@ -174,23 +206,11 @@ CARDS = {
    'error': ErrorCard
 }
 
+### Card ROutes
+@app.route("/")
+def home():
+   return redirect(url_for('route_card', card='home'))
+
 @app.route("/card/<card>", methods=["GET", "POST"])
 def route_card(card):
    return card_router(CARDS.get(card, ErrorCard))
-
-# deprecated
-@app.route("/scuttle", methods=["GET", "POST"])
-def old_scuttle():
-   return redirect("/card/scuttle")
-
-# deprecated
-@app.route("/summarize", methods=["GET", "POST"])
-def old_summarize():
-   return redirect("/card/summarize")
-
-
-def main():
-   app.run(host=LISTEN_HOST, port=PORT)
-
-if __name__ == "__main__":
-   main()
