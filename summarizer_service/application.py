@@ -212,7 +212,7 @@ CARDS = {
    'error': ErrorCard
 }
 
-### Card ROutes
+### Routes
 @app.route("/")
 def home():
    return redirect(url_for('route_card', card='home'))
