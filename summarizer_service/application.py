@@ -94,8 +94,10 @@ class URLCard(BaseCard):
             raise ValueError("Unsupported URL type", self.url)
 
    def process(self):
-      self.summary = check_output([SUMMARIZE_BIN, self.url, self.prompt]).decode('utf-8')
-      return self.get_template()
+      if self.url:
+         if not (self.url.startswith('http://') or self.url.startswith('https://')):
+            raise ValueError("Unsupported URL type", self.url)
+      return None
                                     
 class SummarizeCard(URLCard):
    def __init__(self):
@@ -109,10 +111,8 @@ class SummarizeCard(URLCard):
       ]
 
    def process(self):
-      if self.url:
-         if not (self.url.startswith('http://') or self.url.startswith('https://')):
-            raise ValueError("Unsupported URL type", self.url)
-         self.summary = check_output([SUMMARIZE_BIN, self.url, self.prompt]).decode('utf-8')
+      super().process()
+      self.summary = check_output([SUMMARIZE_BIN, self.url, self.prompt]).decode('utf-8')
       return self.get_template()
 
 class ScuttleCard(URLCard):
@@ -120,6 +120,7 @@ class ScuttleCard(URLCard):
       super().__init__(template='cards/scuttle/index.page')
 
    def process(self):
+      super().process()
       scuttle_url = self.decode_scuttle_output(self.call_scuttle(self.url))
       if scuttle_url:
          return redirect(scuttle_url)
@@ -173,6 +174,7 @@ class ViaAPIModelCard(BaseCard):
       return models_list
 
    def process(self):
+      super().process()
       if self.model_name:
          self.output = check_output([VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
       return self.get_template()
