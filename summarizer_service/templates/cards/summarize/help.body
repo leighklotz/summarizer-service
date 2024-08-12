@@ -5,8 +5,9 @@
     <p>This web application allows you to input a URL and receive a summary of the associated article. Follow the steps below:</p>
     <ol>
       <li>Enter the URL of the article you'd like to summarize in the "<strong>Enter URL</strong>" field.</li>
-      <li>Click the "<strong>Summarize</strong>" button to initiate the summarization process.</li>
-      <li>The application will then generate a concise summary of the article, which will be displayed in the three text boxes below the input fields.</li>
+      <li>Click the "<strong>Summarize</strong>" button to summarize the retrieved web page text, along with the optional prompt.</li>
+      <li>Wait for the summary of the article to be displayed below the buttons.</li>
+      <li>Click on the newly-appearing tab buttons for Text and Markdown to see those views of the response.</li>
     </ol>
     <h2>Bookmarklet</h2>
     <ul>
