@@ -1,8 +1,0 @@
-<style>
-  #rawText.display { display: block; }
-  #rawText.hide { display: none; }
-  #output.hide { display: none; }
-  #output.display { display: block; }
-</style>
-
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
