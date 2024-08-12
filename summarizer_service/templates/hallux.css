@@ -1,8 +1,8 @@
 body {
-    font-family: 'Architects Daughter', cursive;
+    font-family: 'Architects Daughter';
     background: #f7f7f7;
     color: #333;
-    margin: 0;
+    margin: 2pt;
     padding: 0;
 }
 .container {
