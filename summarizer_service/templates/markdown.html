@@ -37,8 +37,10 @@ document.addEventListener("DOMContentLoaded", function() {
 	  const input = document.getElementById('markdownInput');
 
 	  if (this.checked) {
+	      // todo: dom sanitize
 	      let v = marked.parse(input.innerText);
 	      output.innerHTML = v;
+	      // todo: clean up
 	      output.classList.remove('hide');
 	      output.classList.add('display');
 	      input.classList.remove('display');

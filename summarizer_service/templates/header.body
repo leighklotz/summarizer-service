@@ -7,3 +7,4 @@
     <style>{% include('accordion.css') %}</style>
     <script>{% include('accordion.js') %}</script>
     <script>{% include('loading.js') %}</script>
+    {% include('markdown.html') %}
