@@ -1,31 +1,37 @@
 .tab-container {
-     display: flex;
-     justify-content: flex-start;
-     border-bottom: 2px solid #ccc;
-     margin-bottom: 10px;
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 10px;
 }
- 
-.tab-button {
-    display: inline-block;
+
+.tab-button,
+button.tab-button {
+    display: inline-flex; /* Ensure that inline elements behave like flex containers */
+    align-items: center; /* Center items vertically */
+    justify-content: center; /* Center items horizontally */
     padding: 10px 15px;
     margin-right: 5px;
     text-decoration: none;
     font-weight: bold;
+    font-family: 'Architects Daughter', sans-serif;
     color: #333;
     border: 1px solid #ccc;
     border-bottom: none;
     background-color: #f1f1f1;
     transition: background-color 0.3s ease;
     border-radius: 5px 5px 0 0;
-    cursor: pointer; /* Add this to ensure the button still looks clickable */
+    cursor: pointer;
+    box-sizing: border-box; /* Ensure padding and borders are included in width and height */
 }
 
-.tab-button.active {
+.tab-button.active,
+button.tab-button.active {
     background-color: #333;
     color: white;
     border-bottom: 2px solid white;
 }
 
-.tab-button:not(.active):hover {
+.tab-button:not(.active):hover,
+button.tab-button:not(.active):hover {
     background-color: #ddd;
 }

@@ -12,11 +12,12 @@
   <div id="loading"></div>
 </form>
 <p />
+
 <div class="tab-container">
   <button type="submit" class="tab-button active" id="submit-button" form="mainform">Summarize</button>
 {%if card.summary %}
-  <a href="#" class="tab-button active" id="textTab">Text</a>
   <a href="#" class="tab-button" id="markdownTab">Markdown</a>
+  <a href="#" class="tab-button active" id="textTab">Text</a>
 {% endif %}
 </div>
 
@@ -29,7 +30,6 @@
     </div>
 {% endif %}
 
-<hr />
 <datalist id="prompts">
   <option value="">
   <option value="Summarize">
