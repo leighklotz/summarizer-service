@@ -60,7 +60,7 @@ body {
     margin: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     flex: 1 0 30%;
-    text-align: center;
+    //text-align: center;
     border: 2px solid #444;
 }
 .card h3 {

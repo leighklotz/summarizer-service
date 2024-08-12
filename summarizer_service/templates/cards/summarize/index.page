@@ -11,17 +11,17 @@
   </div>
   <button type="submit" id="submit-button">Summarize</button>
   {%if card.summary %}
-    <label class="form-check-label" for="markdownToggle">Markdown
-      <input class="form-check-input" type="checkbox" value="" id="markdownToggle">
+    <label class="form-check-label" for="rawTextToggle">Show Raw Text
+      <input class="form-check-input" type="checkbox" id="rawTextToggle">
     </label>
   {% endif %}
   <div id="loading"></div>
 </form>
 
 {%if card.summary %}
-    <div id="output" class="form-control""></div>
+    <div id="output" class="form-control"></div>
 
-    <div id="markdownInput" class="form-control">
+    <div id="rawText" class="form-control">
     {% for para in card.summary.split('\n') %}
       <p>{{para}}</p>
     {% endfor %}
