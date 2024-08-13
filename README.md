@@ -67,7 +67,7 @@ gunicorn -b 0.0.0.0:8080 summarizer_service:app
 - `/`: Home card
 - `/scuttle?url=`: Scuttle bookmarking service card
 - `/summarize?url=&prompt=`: Text summarization with optional prompt card
-- `/via-api-model?model_name=': List models and select current; POST to load.
+- `/via-api-model?model_name=`: List models and select current; POST to load.
 
 Cards are implemented in `app.py` and with templates in `templates/cards/cardname`.
 
