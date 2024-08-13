@@ -25,7 +25,7 @@
 <div id="output" class="form-control display"></div>
   <!-- avoid adding indentation to markdown paras -->
   <div id="rawText" class="form-control hide">{% for para in card.summary.split('\n') %}
-<p>{{para}}</p>
+{{para}}
 {% endfor %}
     </div>
 {% endif %}
