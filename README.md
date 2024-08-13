@@ -59,7 +59,7 @@ The application will be accessible at `http://localhost:8080`.
 
 3. Run with gunicorn, for example as a service.
 
-``bash
+```bash
 gunicorn -b 0.0.0.0:8080 summarizer_service:app
 ```
 
