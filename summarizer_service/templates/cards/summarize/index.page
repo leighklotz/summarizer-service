@@ -2,24 +2,34 @@
 {% block title %}Summarizer{% endblock %}
 {% block h1 %}Summarizer{% endblock %}
 {% block content %}
-<form method="POST">
+<form id="mainform" method="POST">
   <div id="grid">
     {% for field in card.form() %}
       <label for="{{ field['name'] }}">{{ field['label'] }}</label>
       <input {% for attr in field.items() %}{{attr[0]}}="{{attr[1]}}" {% endfor %} />
     {% endfor %}
   </div>
-  <button type="submit" id="submit-button">Summarize</button>
   <div id="loading"></div>
 </form>
+<p />
+
+<div class="tab-container">
+  <button type="submit" class="tab-button active" id="submit-button" form="mainform">Summarize</button>
 {%if card.summary %}
-    <hr />
-    <div>
-      {% for para in card.summary.split('\n') %}
-      <p>{{para}}</p>
-      {% endfor %}
+  <a href="#" class="tab-button" id="markdownTab">Markdown</a>
+  <a href="#" class="tab-button active" id="textTab">Text</a>
+{% endif %}
+</div>
+
+{%if card.summary %}
+<div id="output" class="form-control display"></div>
+  <!-- avoid adding indentation to markdown paras -->
+  <div id="rawText" class="form-control hide">{% for para in card.summary.split('\n') %}
+{{para}}
+{% endfor %}
     </div>
 {% endif %}
+
 <datalist id="prompts">
   <option value="">
   <option value="Summarize">

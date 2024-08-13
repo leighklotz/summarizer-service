@@ -9,3 +9,6 @@ label, button { font-weight: bold; }
 #grid input { width: 50%; }
 button { grid-column: span 1; margin-top: 10px; }
 
+b, strong { font-weight: bold; text-shadow: 1px 1px 0px #888; }
+	    
+

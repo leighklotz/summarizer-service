@@ -2,7 +2,7 @@
 {% block title %}VIA-API Model Manager{% endblock %}
 {% block h1 %}VIA-API Model Manager{% endblock %}
 {% block content %}
-<form method="POST">
+<form id="mainform" method="POST">
   <div id="grid">
     <label for="model_name">Model Name:</label>
     <select id="model_name" name="model_name">

@@ -59,7 +59,7 @@ The application will be accessible at `http://localhost:8080`.
 
 3. Run with gunicorn, for example as a service.
 
-``bash
+```bash
 gunicorn -b 0.0.0.0:8080 summarizer_service:app
 ```
 
@@ -67,7 +67,7 @@ gunicorn -b 0.0.0.0:8080 summarizer_service:app
 - `/`: Home card
 - `/scuttle?url=`: Scuttle bookmarking service card
 - `/summarize?url=&prompt=`: Text summarization with optional prompt card
-- `/via-api-model?model_name=': List models and select current; POST to load.
+- `/via-api-model?model_name=`: List models and select current; POST to load.
 
 Cards are implemented in `app.py` and with templates in `templates/cards/cardname`.
 

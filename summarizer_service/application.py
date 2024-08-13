@@ -2,6 +2,7 @@
 # Copyright 2024 Leigh Klotz
 # A web application that provides LLM-based text web page summarization for bookmarking services using Flask, subprocesses, and custom scripts.
 
+import logging
 import os
 from flask import Flask, request, redirect, render_template, jsonify, url_for, session
 from subprocess import check_output, CalledProcessError
@@ -80,7 +81,7 @@ class URLCard(BaseCard):
 
    def form(self):
       return super().form() + [
-         { 'name':"url", 'label':"Enter URL:", 'type':"url", 'required':"required", 'value': self.url }, 
+         { 'name':'url', 'label':"Enter URL:", 'type':'url', 'required':'required', 'value': self.url, 'autocomplete':  'off' }, 
       ]
 
    def pre_process(self):
@@ -220,3 +221,8 @@ def home():
 @app.route("/card/<card>", methods=["GET", "POST"])
 def route_card(card):
    return card_router(CARDS.get(card, ErrorCard))
+
+if __name__ != '__main__':
+   gunicorn_logger = logging.getLogger('gunicorn.error')
+   app.logger.handlers = gunicorn_logger.handlers
+   app.logger.setLevel(gunicorn_logger.level)

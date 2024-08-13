@@ -8,9 +8,11 @@
   {% include('nav.body') %}
   <main>
   <h1>{% block h1 %}Summarizer{% endblock %}</h1>
+  <div class="card">
     {% block content %}
       <p>Pick a card above.</a>
     {% endblock %}
+  </div>
   </main>
   <hr />
   {% block helpbody %}
