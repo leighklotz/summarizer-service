@@ -87,9 +87,11 @@ class URLCard(BaseCard):
    def pre_process(self):
       super().pre_process()
       if self.url:
+         logger.warn("URLCard.pre_process setting session url 1", self.url)
          session['url'] = self.url
       elif session.get('url', None):
          self.url = session['url']
+         logget.warn("URLCard.pre_process setting session url 2", self.url)
       if self.url:
          if not (self.url.startswith('http://') or self.url.startswith('https://')):
             raise ValueError("Unsupported URL type", self.url)
@@ -185,7 +187,8 @@ class HomeCard(BaseCard):
        super().__init__(template='cards/home/index.page')
 
    def get_template(self):
-      session['url'] = None
+      # test: how about we don't do this? try and and see when we need to clear it
+      # session['url'] = None
       return super().get_template()
 
 class ErrorCard(BaseCard):
@@ -194,6 +197,7 @@ class ErrorCard(BaseCard):
 
 ### Card Routing
 def card_router(card_constructor):
+   ## todo: these lifecycle calls are non-standard and somewhat confusing
    card = card_constructor()
    card.pre_process()
    if request.method == "POST":
@@ -223,6 +227,7 @@ def route_card(card):
    return card_router(CARDS.get(card, ErrorCard))
 
 if __name__ != '__main__':
-   gunicorn_logger = logging.getLogger('gunicorn.error')
+   #gunicorn_logger = logging.getLogger('gunicorn.error')
+   gunicorn_logger = logging.getLogger('gunicorn.warn')
    app.logger.handlers = gunicorn_logger.handlers
    app.logger.setLevel(gunicorn_logger.level)
