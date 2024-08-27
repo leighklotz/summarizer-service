@@ -101,6 +101,8 @@ class URLCard(BaseCard):
       return None
                                     
 class SummarizeCard(URLCard):
+   prompts = [ "", "Summarize", "Answer the question in the title in one sentence", "Summarize as bullet points",
+               "Summarize the main points", "What is unusual about this?", "Write help text to add to this web page" ]
    def __init__(self):
       super().__init__(template='cards/summarize/index.page', params=['prompt'])
       self.prompt = 'Summarize'
