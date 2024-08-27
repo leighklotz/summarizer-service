@@ -33,6 +33,7 @@
 <datalist id="prompts">
   <option value="">
   <option value="Summarize">
+  <option value="Answer the question in the title in one sentence" />
   <option value="Summarize as bullet points" />
   <option value="Summarize the main points" />
   <option value="What is unusual about this?" />
