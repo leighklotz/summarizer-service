@@ -87,14 +87,9 @@ class URLCard(BaseCard):
    def pre_process(self):
       super().pre_process()
       if self.url:
-         logger.warn("URLCard.pre_process setting session url 1", self.url)
          session['url'] = self.url
-      elif session.get('url', None):
+      elif 'url' in session:
          self.url = session['url']
-         logget.warn("URLCard.pre_process setting session url 2", self.url)
-      if self.url:
-         if not (self.url.startswith('http://') or self.url.startswith('https://')):
-            raise ValueError("Unsupported URL type", self.url)
 
    def process(self):
       if self.url:
@@ -112,8 +107,15 @@ class SummarizeCard(URLCard):
 
    def form(self):
       return super().form() + [
-         { 'name':"prompt", 'label':"Prompt:", 'type':"text", 'list':"prompts" }
+         { 'name':"prompt", 'label':"Prompt:", 'type':"text", 'list':"prompts", 'value': self.prompt }
       ]
+
+   def pre_process(self):
+      super().pre_process()
+      if self.prompt:
+         session['prompt'] = self.prompt
+      elif 'prompt' in session:
+         self.prompt = session['prompt']
 
    def process(self):
       super().process()
