@@ -14,14 +14,19 @@ from .config import *
 
 app = None
 
-### main
 def create_app():
-   global app
-   if app is None:
-      app = Flask(__name__)
-      # todo: preserve this in config between runs
-      app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', os.urandom(24).hex())
-   return app
+    global app
+    if app is None:
+        app = Flask(__name__)
+
+        if not app.config.get('SECRET_KEY', None):
+            try:
+                app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+            except KeyError:
+                raise ValueError("No 'SECRET_KEY' specified in environment variables; sessions will not work.")
+        app.config['SESSION_TYPE'] = 'filesystem'
+
+    return app
 
 app = create_app()
 
