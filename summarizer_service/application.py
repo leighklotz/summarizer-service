@@ -143,11 +143,11 @@ class ScuttleCard(URLCard):
       if not (url.startswith('http://') or url.startswith('https://')):
          raise ValueError("Unsupported URL type", url)
       output = check_output([SCUTTLE_BIN, '--json', url]).decode('utf-8')
-      log.info(f"*** scuttle {url=} {output=}")
+      app.logger.info(f"*** scuttle {url=} {output=}")
       try:
          result = json.loads(output)
       except json.JSONDecodeError:
-         log.error(f"*** [ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE")
+         app.logger.error(f"*** [ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE")
          raise
       return result
 
