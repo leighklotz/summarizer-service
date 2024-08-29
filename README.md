@@ -1,6 +1,3 @@
-
-
-
 # Summarizer Service
 A web application that provides LLM-based text web page summarization for bookmarking services using Flask, subprocesses, and custom scripts.
 
