@@ -74,6 +74,7 @@ Replace host.example.com with your hostname and add to your browser toolbar.
 ## Scuttle
 Summarize current web page with keywords and open a window to post to Scuttle.
 
+![Bookmarklet Screenshot](docs/bookmarklet/bookmarklet.png)
 ```javascript
 javascript:(  function() %7B    var x = document;    var a = encodeURIComponent(x.location.href);    var d = encodeURIComponent(window.getSelection());    open('https://host.example.com/card/scuttle?url=%27%20+%20a%20+%20%27&prompt=%27%20+%20d,%20%27SemanticScuttle%20-%20example.com%27,%20%27modal=1,status=0,scrollbars=1,toolbar=0,resizable=1,width=790,height=465,left=%27%20+%20(screen.width-790)/2%20+%20%27,top=%27%20+%20(screen.height-425)/2);%20%20%7D)();
 ```
