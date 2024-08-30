@@ -102,31 +102,6 @@ class URLCard(BaseCard):
             raise ValueError("Unsupported URL type", self.url)
       return None
                                     
-class SummarizeCard(URLCard):
-   prompts = [ "", "Summarize", "Answer the question in the title in one sentence", "Summarize as bullet points",
-               "Summarize the main points", "What is unusual about this?", "Write help text to add to this web page" ]
-   def __init__(self):
-      super().__init__(template='cards/summarize/index.page', params=['prompt'])
-      self.prompt = 'Summarize'
-      self.summary = '' 
-
-   def form(self):
-      return super().form() + [
-         { 'name':"prompt", 'label':"Prompt:", 'type':"text", 'list':"prompts", 'value': self.prompt }
-      ]
-
-   def pre_process(self):
-      super().pre_process()
-      if self.prompt:
-         session['prompt'] = self.prompt
-      elif 'prompt' in session:
-         self.prompt = session['prompt']
-
-   def process(self):
-      super().process()
-      self.summary = check_output([SUMMARIZE_BIN, self.url, self.prompt]).decode('utf-8')
-      return self.get_template()
-
 class ScuttleCard(URLCard):
    def __init__(self):
       super().__init__(template='cards/scuttle/index.page')
@@ -168,6 +143,55 @@ class ScuttleCard(URLCard):
          return keywords
       else:
          raise ValueError("Not a string or list of strings", keywords)
+
+class SummarizeCard(URLCard):
+   prompts = [ "", "Summarize", "Answer the question in the title in one sentence", "Summarize as bullet points",
+               "Summarize the main points", "What is unusual about this?", "Write help text to add to this web page" ]
+   def __init__(self):
+      super().__init__(template='cards/summarize/index.page', params=['prompt'])
+      self.prompt = 'Summarize'
+      self.summary = '' 
+
+   def form(self):
+      return super().form() + [
+         { 'name':"prompt", 'label':"Prompt:", 'type':"text", 'list':"prompts", 'value': self.prompt }
+      ]
+
+   def pre_process(self):
+      super().pre_process()
+      if self.prompt:
+         session['prompt'] = self.prompt
+      elif 'prompt' in session:
+         self.prompt = session['prompt']
+
+   def process(self):
+      super().process()
+      self.summary = check_output([SUMMARIZE_BIN, self.url, self.prompt]).decode('utf-8')
+      return self.get_template()
+
+class AnswerCard(BaseCard):
+   def __init__(self):
+      super().__init__(template='cards/answer/index.page', params=['question'])
+      self.question = ''
+      self.answer = '' 
+
+   def form(self):
+      return super().form() + [
+         { 'name':"question", 'label':"Question:", 'type':"text", 'value': self.question }
+      ]
+
+   def pre_process(self):
+      super().pre_process()
+      if self.question:
+         session['question'] = self.question
+      elif 'question' in session:
+         self.question = session['question']
+
+   def process(self):
+      super().process()
+      self.answer = check_output([ASK_BIN, "any", self.question]).decode('utf-8')
+      return self.get_template()
+
 
 class ViaAPIModelCard(BaseCard):
    LOAD_MODEL_FLAG = '--load-model'
@@ -220,8 +244,9 @@ def card_router(card_constructor):
    
 CARDS = {
    'home': HomeCard,
-   'summarize': SummarizeCard,
    'scuttle': ScuttleCard,
+   'summarize': SummarizeCard,
+   'answer': AnswerCard,
    'via-api-model': ViaAPIModelCard,
    'error': ErrorCard
 }

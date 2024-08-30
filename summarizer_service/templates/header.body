@@ -13,4 +13,3 @@
     <style>{% include('markdown.css') %}</style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>{% include('markdown.js') %}</script>
-    
