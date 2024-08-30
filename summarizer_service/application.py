@@ -169,9 +169,9 @@ class SummarizeCard(URLCard):
       self.summary = check_output([SUMMARIZE_BIN, self.url, self.prompt]).decode('utf-8')
       return self.get_template()
 
-class AnswerCard(BaseCard):
+class AskCard(BaseCard):
    def __init__(self):
-      super().__init__(template='cards/answer/index.page', params=['question'])
+      super().__init__(template='cards/ask/index.page', params=['question'])
       self.question = ''
       self.answer = '' 
 
@@ -246,7 +246,7 @@ CARDS = {
    'home': HomeCard,
    'scuttle': ScuttleCard,
    'summarize': SummarizeCard,
-   'answer': AnswerCard,
+   'ask': AskCard,
    'via-api-model': ViaAPIModelCard,
    'error': ErrorCard
 }
