@@ -2,5 +2,6 @@
       <a href="/card/home">Home</a>
       <a href="/card/scuttle">Scuttle</a>
       <a href="/card/summarize">Summarize</a>
+      <a href="/card/answer">Answer</a>
       <a href="/card/via-api-model">Via API Models</a>
     </nav>
