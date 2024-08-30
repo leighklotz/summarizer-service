@@ -1,0 +1,36 @@
+{% extends "cards/card-base.page" %}
+{% block title %}Ask{% endblock %}
+{% block h1 %}Ask{% endblock %}
+{% block content %}
+<form id="mainform" method="POST">
+  <div id="grid">
+    {% for field in card.form() %}
+      <label for="{{ field['name'] }}">{{ field['label'] }}</label>
+      <input {% for attr in field.items() %}{{attr[0]}}="{{attr[1]}}" {% endfor %} />
+    {% endfor %}
+  </div>
+  <div id="loading"></div>
+</form>
+<p />
+
+<div class="tab-container">
+  <button type="submit" class="tab-button active" id="submit-button" form="mainform">Answer</button>
+{%if card.answer %}
+  <a href="#" class="tab-button" id="markdownTab">Markdown</a>
+  <a href="#" class="tab-button active" id="textTab">Text</a>
+{% endif %}
+</div>
+
+{%if card.answer %}
+<div id="output" class="form-control display"></div>
+  <!-- avoid adding indentation to markdown paras -->
+  <div id="rawText" class="form-control hide">{% for para in card.answer.split('\n') %}
+{{para}}
+{% endfor %}
+    </div>
+{% endif %}
+
+{% endblock %}
+{% block helpbody %}
+  {% include('cards/ask/help.body') %}
+{% endblock %}
