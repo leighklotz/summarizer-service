@@ -68,5 +68,29 @@ gunicorn -b 0.0.0.0:8080 summarizer_service:app
 
 Cards are implemented in `app.py` and with templates in `templates/cards/cardname`.
 
+# Bookmarklets
+Replace host.example.com with your hostname and add to your browser toolbar.
+
+## Scuttle
+Summarize current web page with keywords and open a window to post to Scuttle.
+
+```javascript
+javascript:(  function() %7B    var x = document;    var a = encodeURIComponent(x.location.href);    var d = encodeURIComponent(window.getSelection());    open('https://host.example.com/card/scuttle?url=%27%20+%20a%20+%20%27&prompt=%27%20+%20d,%20%27SemanticScuttle%20-%20example.com%27,%20%27modal=1,status=0,scrollbars=1,toolbar=0,resizable=1,width=790,height=465,left=%27%20+%20(screen.width-790)/2%20+%20%27,top=%27%20+%20(screen.height-425)/2);%20%20%7D)();
+```
+
+## Summarize
+Summarize current web page and open a window with the summary. Current selectin is optional additional prompt.
+
+```javascript
+javascript:(  function() %7B    var x = document;    var a = encodeURIComponent(x.location.href);    var d = encodeURIComponent(window.getSelection());    open('https://host.example.com/card/summarize?url=%27%20+%20a%20+%20%27&prompt=%27%20+%20d,%20%27Summarize20-%20example.com%27,%20%27modal=1,status=0,scrollbars=1,toolbar=0,resizable=1,width=790,height=465,left=%27%20+%20(screen.width-790)/2%20+%20%27,top=%27%20+%20(screen.height-425)/2);%20%20%7D)();
+```
+
+## Ask
+Ask a question (default to current selection) and and open a window with the answer.
+
+```javascript
+javascript:(  function() %7B    var x = document;    var d = encodeURIComponent(window.getSelection());    open('https://host.example.com/card/ask?question=%27%20+%20d,%20%27Ask20-%20example.com%27,%20%27modal=1,status=0,scrollbars=1,toolbar=0,resizable=1,width=790,height=465,left=%27%20+%20(screen.width-790)/2%20+%20%27,top=%27%20+%20(screen.height-425)/2);%20%20%7D)();
+```
+
 ### License
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
