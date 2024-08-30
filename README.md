@@ -69,11 +69,11 @@ gunicorn -b 0.0.0.0:8080 summarizer_service:app
 Cards are implemented in `app.py` and with templates in `templates/cards/cardname`.
 
 # Bookmarklets
+Use these bookmarklets from your desktop browser to send pages and text to the summarizer.
+
 Replace host.example.com with your hostname and add to your browser toolbar.
 
-<div style="display: flex; justify-content: center; margin: auto; width: 50%;">
-  <img src="docs/bookmarklet/bookmarklet.png" alt="Bookmarklet Screenshot" style="max-width: 100%; height: auto;">
-</div>
+![Bookmarklet Screenshot](docs/bookmarklet/bookmarklet.png)
 
 
 ## Scuttle
