@@ -31,237 +31,246 @@ def create_app():
 app = create_app()
 
 class BaseCard:
-   VIA_FLAG = '--via'
-   API_FLAG = 'api'
-   GET_MODEL_NAME_FLAG = '--get-model-name'
+    VIA_FLAG = '--via'
+    API_FLAG = 'api'
+    GET_MODEL_NAME_FLAG = '--get-model-name'
 
-   def __init__(self, template, params=[]):
-       self.template = template
-       self.params = params
-       self.stats = self.get_stats()
+    def __init__(self, template, params=[]):
+        self.template = template
+        self.params = params
+        self.stats = self.get_stats()
 
-   def get_template(self):
-      return render_template(self.template, card=self)
+    def get_template(self):
+        return render_template(self.template, card=self)
 
-   def pre_process(self):
-      for param in self.params:
-         setattr(self, param, request.args.get(param, request.form.get(param, '')))
+    def pre_process(self):
+        for param in self.params:
+            setattr(self, param, request.args.get(param, request.form.get(param, '')))
 
-   def process(self):
-      return self.get_template()
+    def process(self):
+        return self.get_template()
 
-   def form(self):
-      return []
+    def form(self):
+        return []
 
-   def _get_model_info(self):
-      via = os.environ.get('VIA', DEFAULT_VIA)
-      model_type = os.environ.get('MODEL_TYPE', DEFAULT_MODEL_TYPE)
-      return {
-         'via': via,
-         'model_type': model_type,
-         'model_name': self._get_via_script(VIA_BIN, self.VIA_FLAG, via, self.GET_MODEL_NAME_FLAG) or f"{model_type}?",
-         'model_link': self._determine_model_link(via, model_type)
-      }
+    def _get_model_info(self):
+        via = os.environ.get('VIA', DEFAULT_VIA)
+        model_type = os.environ.get('MODEL_TYPE', DEFAULT_MODEL_TYPE)
+        return {
+            'via': via,
+            'model_type': model_type,
+            'model_name': self._get_via_script(VIA_BIN, self.VIA_FLAG, via, self.GET_MODEL_NAME_FLAG) or f"{model_type}?",
+            'model_link': self._determine_model_link(via, model_type)
+        }
 
-   def _get_via_script(self, script_bin, *args):
-      try:
-         return (check_output([script_bin] + list(args)).decode('utf-8') or "").strip()
-      except CalledProcessError:
-         return None
+    def _get_via_script(self, script_bin, *args):
+        try:
+            return (check_output([script_bin] + list(args)).decode('utf-8') or "").strip()
+        except CalledProcessError:
+            return None
 
-   def _determine_model_link(self, via, model_type):
-      return OPENAPI_UI_SERVER if via == "api" else LLAMAFILES_LINK
+    def _determine_model_link(self, via, model_type):
+        return OPENAPI_UI_SERVER if via == "api" else LLAMAFILES_LINK
 
-   def get_stats(self):
-      nvfree = self._get_via_script(NVFREE_BIN) or "0"
-      stats = {'nvfree': nvfree}
-      model_info = self._get_model_info()
-      stats.update(model_info)
-      return stats
+    def get_stats(self):
+        nvfree = self._get_via_script(NVFREE_BIN) or "0"
+        stats = {'nvfree': nvfree}
+        model_info = self._get_model_info()
+        stats.update(model_info)
+        return stats
 
 class URLCard(BaseCard):
-   def __init__(self, template, params=[]):
-      self.url = ''
-      super().__init__(template=template, params=(params + ['url']))
+    def __init__(self, template, params=[]):
+        self.url = ''
+        super().__init__(template=template, params=(params + ['url']))
 
-   def form(self):
-      return super().form() + [
-         { 'name':'url', 'label':"Enter URL:", 'type':'url', 'required':'required', 'value': self.url, 'autocomplete':  'off' }, 
-      ]
+    def form(self):
+        return super().form() + [
+            { 'name':'url', 'label':"Enter URL:", 'type':'url', 'required':'required', 'value': self.url, 'autocomplete':  'off' }, 
+        ]
 
-   def pre_process(self):
-      super().pre_process()
-      if self.url:
-         session['url'] = self.url
-      elif 'url' in session:
-         self.url = session['url']
+    def pre_process(self):
+        super().pre_process()
+        if self.url:
+            session['url'] = self.url
+        elif 'url' in session:
+            self.url = session['url']
 
-   def process(self):
-      if self.url:
-         if not (self.url.startswith('http://') or self.url.startswith('https://')):
-            raise ValueError("Unsupported URL type", self.url)
-      return None
+    def process(self):
+        if self.url:
+            if not (self.url.startswith('http://') or self.url.startswith('https://')):
+                raise ValueError("Unsupported URL type", self.url)
+            return None
                                     
 class ScuttleCard(URLCard):
-   def __init__(self):
-      super().__init__(template='cards/scuttle/index.page')
+    def __init__(self):
+        super().__init__(template='cards/scuttle/index.page')
 
-   def process(self):
-      super().process()
-      scuttle_url = self.decode_scuttle_output(self.call_scuttle(self.url))
-      if scuttle_url:
-         return redirect(scuttle_url)
-      else:
-         return self.get_template()
+    def process(self):
+        super().process()
+        scuttle_url = self.decode_scuttle_output(self.call_scuttle(self.url))
+        if scuttle_url:
+            return redirect(scuttle_url)
+        else:
+            return self.get_template()
 
-   def call_scuttle(self, url):
-      if not (url.startswith('http://') or url.startswith('https://')):
-         raise ValueError("Unsupported URL type", url)
-      output = check_output([SCUTTLE_BIN, '--json', url]).decode('utf-8')
-      app.logger.info(f"*** scuttle {url=} {output=}")
-      try:
-         result = json.loads(output)
-      except json.JSONDecodeError:
-         app.logger.error(f"*** [ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE")
-         raise
-      return result
+    def call_scuttle(self, url):
+        if not (url.startswith('http://') or url.startswith('https://')):
+            raise ValueError("Unsupported URL type", url)
+        output = check_output([SCUTTLE_BIN, '--json', url]).decode('utf-8')
+        app.logger.info(f"*** scuttle {url=} {output=}")
+        try:
+            result = json.loads(output)
+        except json.JSONDecodeError:
+            app.logger.error(f"*** [ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE")
+            raise
+        return result
 
-   def decode_scuttle_output(self, data):
-      # Decode the output from the Scuttle tool
-      link = data['link']
-      title = data['title']
-      description = data['description']
-      tags = self.list_to_comma_separated(data['keywords'])
-      url = f"https://scuttle.klotz.me/bookmarks/klotz?action=add&address={quote_plus(link)}&description={quote_plus(description)}&title={quote_plus(title)}&tags={quote_plus(tags)}"
-      return url
-
-   def list_to_comma_separated(self, keywords):
-      # Convert a list of keywords to a comma-separated string
-      if isinstance(keywords, list):
-         return ', '.join(keywords)
-      elif isinstance(keywords, str):
-         return keywords
-      else:
-         raise ValueError("Not a string or list of strings", keywords)
-
+    def decode_scuttle_output(self, data):
+       # Decode the output from the Scuttle tool
+       link = data['link']
+       title = data['title']
+       description = data['description']
+       tags = self.list_to_comma_separated(data['keywords'])
+       url = f"https://scuttle.klotz.me/bookmarks/klotz?action=add&address={quote_plus(link)}&description={quote_plus(description)}&title={quote_plus(title)}&tags={quote_plus(tags)}"
+       return url
+ 
+    def list_to_comma_separated(self, keywords):
+       # Convert a list of keywords to a comma-separated string
+       if isinstance(keywords, list):
+          return ', '.join(keywords)
+       elif isinstance(keywords, str):
+          return keywords
+       else:
+          raise ValueError("Not a string or list of strings", keywords)
+ 
 class SummarizeCard(URLCard):
-   prompts = [ "", "Summarize", "Answer the question in the title in one sentence", "Summarize as bullet points",
-               "Summarize the main points", "What is unusual about this?", "Write help text to add to this web page" ]
-   def __init__(self):
-      super().__init__(template='cards/summarize/index.page', params=['prompt'])
-      self.prompt = 'Summarize'
-      self.summary = '' 
-
-   def form(self):
-      return super().form() + [
-         { 'name':"prompt", 'label':"Prompt:", 'type':"text", 'list':"prompts", 'value': self.prompt }
-      ]
-
-   def pre_process(self):
-      super().pre_process()
-      if self.prompt:
-         session['prompt'] = self.prompt
-      elif 'prompt' in session:
-         self.prompt = session['prompt']
-
-   def process(self):
-      super().process()
-      self.summary = check_output([SUMMARIZE_BIN, self.url, self.prompt]).decode('utf-8')
-      return self.get_template()
+    prompts = [ "", "Summarize", "Answer the question in the title in one sentence", "Summarize as bullet points",
+                "Summarize the main points", "What is unusual about this?", "Write help text to add to this web page" ]
+    def __init__(self):
+       super().__init__(template='cards/summarize/index.page', params=['prompt'])
+       self.prompt = 'Summarize'
+       self.summary = '' 
+ 
+    def form(self):
+       return super().form() + [
+          { 'name':"prompt", 'label':"Prompt:", 'type':"text", 'list':"prompts", 'value': self.prompt }
+       ]
+ 
+    def pre_process(self):
+       super().pre_process()
+       if self.prompt:
+          session['prompt'] = self.prompt
+       elif 'prompt' in session:
+          self.prompt = session['prompt']
+ 
+    def process(self):
+       super().process()
+       self.summary = check_output([SUMMARIZE_BIN, self.url, self.prompt]).decode('utf-8')
+       return self.get_template()
 
 class AskCard(BaseCard):
-   def __init__(self):
-      super().__init__(template='cards/ask/index.page', params=['question'])
-      self.question = ''
-      self.answer = '' 
-
-   def form(self):
-      return super().form() + [
-         { 'name':"question", 'label':"Question:", 'type':"text", 'value': self.question }
-      ]
-
-   def pre_process(self):
-      super().pre_process()
-      if self.question:
-         session['question'] = self.question
-      elif 'question' in session:
-         self.question = session['question']
-
-   def process(self):
-      super().process()
-      self.answer = check_output([ASK_BIN, "any", self.question]).decode('utf-8')
-      return self.get_template()
-
-
+    def __init__(self):
+       super().__init__(template='cards/ask/index.page', params=['question', 'context'])
+       self.question = ''
+       self.context = '' 
+       self.answer = '' 
+ 
+    def form(self):
+       return super().form() + [
+           { 'name':"question", 'label':"Question:", 'type':"text", 'value': self.question },
+           { 'name':"context", 'label':"Context:", 'type':"text", 'value': self.context, 'tag':'textarea' }
+       ]
+ 
+    def pre_process(self):
+       super().pre_process()
+       if self.question:
+          session['question'] = self.question
+       elif 'question' in session:
+          self.question = session['question']
+       if self.context:
+          session['context'] = self.context
+       elif 'context' in session:
+          self.context = session['context']
+ 
+    def process(self):
+       super().process()
+       self.answer = check_output([ASK_BIN, "any", self.question], input=self.context.encode("utf-8")).decode('utf-8')
+       return self.get_template()
+ 
+ 
 class ViaAPIModelCard(BaseCard):
-   LOAD_MODEL_FLAG = '--load-model'
-   LIST_MODELS_FLAG = '--list-models'
-
-   def __init__(self):
-      super().__init__(template='cards/via-api-model/index.page', params=['model_name', 'output'])
-      self.model_name = ''
-      self.output = ''
-      self.models_list = self.get_models_list()
-
-   def get_models_list(self):
-      # use shell via --api to get the newline separated list of model names into an array of strings
-      models_list = check_output([VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LIST_MODELS_FLAG]).decode('utf-8').split('\n')
-      models_list = [ model_name.strip() for model_name in models_list ]
-      return models_list
-
-   def process(self):
-      super().process()
-      if self.model_name:
-         self.output = check_output([VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
-      return self.get_template()
-
+    LOAD_MODEL_FLAG = '--load-model'
+    LIST_MODELS_FLAG = '--list-models'
+ 
+    def __init__(self):
+       super().__init__(template='cards/via-api-model/index.page', params=['model_name', 'output'])
+       self.model_name = ''
+       self.output = ''
+       self.models_list = self.get_models_list()
+ 
+    def get_models_list(self):
+       # use shell via --api to get the newline separated list of model names into an array of strings
+       models_list = check_output([VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LIST_MODELS_FLAG]).decode('utf-8').split('\n')
+       models_list = [ model_name.strip() for model_name in models_list ]
+       return models_list
+ 
+    def process(self):
+       super().process()
+       if self.model_name:
+          self.output = check_output([VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
+       return self.get_template()
+ 
 class HomeCard(BaseCard):
-   def __init__(self):
-       super().__init__(template='cards/home/index.page')
+    def __init__(self):
+        super().__init__(template='cards/home/index.page')
 
-   def get_template(self):
-      # test: how about we don't do this? try and and see when we need to clear it
-      # session['url'] = None
-      return super().get_template()
+    def get_template(self):
+        # clear previous args on hoem card
+        return super().get_template()
 
 class ErrorCard(BaseCard):
-   def __init__(self):
-       super().__init__(template='cards/error/index.page')
+    def __init__(self):
+        super().__init__(template='cards/error/index.page')
 
 ### Card Routing
 def card_router(card_constructor):
-   ## todo: these lifecycle calls are non-standard and somewhat confusing
-   card = card_constructor()
-   card.pre_process()
-   if request.method == "POST":
-      result = card.process()
-      if result is not None:
-         return result
-      else:
-         return card.get_template()
-   else:
-      return card.get_template()
-   
+    ## todo: these lifecycle calls are non-standard and somewhat confusing
+    card = card_constructor()
+    card.pre_process()
+    if request.method == "POST":
+       result = card.process()
+       if result is not None:
+          return result
+       else:
+          return card.get_template()
+    else:
+       return card.get_template()
+    
 CARDS = {
-   'home': HomeCard,
-   'scuttle': ScuttleCard,
-   'summarize': SummarizeCard,
-   'ask': AskCard,
-   'via-api-model': ViaAPIModelCard,
-   'error': ErrorCard
+    'home': HomeCard,
+    'scuttle': ScuttleCard,
+    'summarize': SummarizeCard,
+    'ask': AskCard,
+    'via-api-model': ViaAPIModelCard,
+    'error': ErrorCard
 }
 
 ### Routes
 @app.route("/")
-def home():
-   return redirect(url_for('route_card', card='home'))
+def root():
+    # clear session on root card
+    session['url'] = None
+    session['question'] = None
+    session['context'] = None
+    return redirect(url_for('route_card', card='home'))
 
 @app.route("/card/<card>", methods=["GET", "POST"])
 def route_card(card):
    return card_router(CARDS.get(card, ErrorCard))
 
 if __name__ != '__main__':
-   #gunicorn_logger = logging.getLogger('gunicorn.error')
-   gunicorn_logger = logging.getLogger('gunicorn.warn')
-   app.logger.handlers = gunicorn_logger.handlers
-   app.logger.setLevel(gunicorn_logger.level)
+    #gunicorn_logger = logging.getLogger('gunicorn.error')
+    gunicorn_logger = logging.getLogger('gunicorn.warn')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)

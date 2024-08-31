@@ -6,7 +6,12 @@
   <div id="grid">
     {% for field in card.form() %}
       <label for="{{ field['name'] }}">{{ field['label'] }}</label>
-      <input {% for attr in field.items() %}{{attr[0]}}="{{attr[1]}}" {% endfor %} />
+      {% set tag = field.get('tag', 'input')  %}
+      {% if tag == 'input': %}
+         <{{tag}} {% for attr in field.items() %}{{attr[0]}}="{{attr[1]}}" {% endfor %}></{{tag}}>
+      {% elif tag == 'textarea': %}
+         <{{tag}} {% for attr in field.items() %}{{attr[0]}}="{{attr[1]}}" {% endfor %}>{{field.get('value', '')}}</{{tag}}>
+      {% endif %}
     {% endfor %}
   </div>
   <div id="loading"></div>

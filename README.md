@@ -91,10 +91,10 @@ javascript:(  function() %7B    var x = document;    var a = encodeURIComponent(
 ```
 
 ## Ask
-Ask a question (default to current selection) and and open a window with the answer.
+Ask a question with optional context (defaults to current selection) and open a window with the answer.
 
 ```javascript
-javascript:(  function() %7B    var x = document;    var d = encodeURIComponent(window.getSelection());    open('https://host.example.com/card/ask?question=%27%20+%20d,%20%27Ask20-%20example.com%27,%20%27modal=1,status=0,scrollbars=1,toolbar=0,resizable=1,width=790,height=465,left=%27%20+%20(screen.width-790)/2%20+%20%27,top=%27%20+%20(screen.height-425)/2);%20%20%7D)();
+javascript:(  function() %7B    var x = document;    var d = encodeURIComponent(window.getSelection()).replace(/%20/g, '+');    open('https://nuc1-psy.klotz.me/card/ask?question=context=%27%20+%20d,%20%27Ask20-%20example.com%27,%20%27modal=1,status=0,scrollbars=1,toolbar=0,resizable=1,width=790,height=465,left=%27%20+%20(screen.width-790)/2%20+%20%27,top=%27%20+%20(screen.height-425)/2);%20%20%7D)();
 ```
 
 ### License
