@@ -44,8 +44,17 @@ class BaseCard:
         return render_template(self.template, card=self)
 
     def pre_process(self):
+        # Extract the specified request parameters and set them as attributes of self and session
         for param in self.params:
-            setattr(self, param, request.args.get(param, request.form.get(param, '')))
+            value = request.args.get(param, request.form.get(param, ''))
+            if value:
+                setattr(self, param, value) 
+                session[param] = value
+
+        # Replace empty self params with values from session
+        for param in self.params:
+            if not getattr(self, param) and param in session:
+                setattr(self, param, session[param])
 
     def process(self):
         return self.get_template()
@@ -65,15 +74,15 @@ class BaseCard:
 
     def _get_via_script(self, script_bin, *args):
         try:
-            return (check_output([script_bin] + list(args)).decode('utf-8') or "").strip()
+            return (check_output([script_bin] + list(args)).decode('utf-8') or '').strip()
         except CalledProcessError:
             return None
 
     def _determine_model_link(self, via, model_type):
-        return OPENAPI_UI_SERVER if via == "api" else LLAMAFILES_LINK
+        return OPENAPI_UI_SERVER if via == 'api' else LLAMAFILES_LINK
 
     def get_stats(self):
-        nvfree = self._get_via_script(NVFREE_BIN) or "0"
+        nvfree = self._get_via_script(NVFREE_BIN) or '0'
         stats = {'nvfree': nvfree}
         model_info = self._get_model_info()
         stats.update(model_info)
@@ -88,13 +97,6 @@ class URLCard(BaseCard):
         return super().form() + [
             { 'name':'url', 'label':"Enter URL:", 'type':'url', 'required':'required', 'value': self.url, 'autocomplete':  'off' }, 
         ]
-
-    def pre_process(self):
-        super().pre_process()
-        if self.url:
-            session['url'] = self.url
-        elif 'url' in session:
-            self.url = session['url']
 
     def process(self):
         if self.url:
@@ -132,7 +134,7 @@ class ScuttleCard(URLCard):
        title = data['title']
        description = data['description']
        tags = self.list_to_comma_separated(data['keywords'])
-       url = f"https://scuttle.klotz.me/bookmarks/klotz?action=add&address={quote_plus(link)}&description={quote_plus(description)}&title={quote_plus(title)}&tags={quote_plus(tags)}"
+       url = f'https://scuttle.klotz.me/bookmarks/klotz?action=add&address={quote_plus(link)}&description={quote_plus(description)}&title={quote_plus(title)}&tags={quote_plus(tags)}'
        return url
  
     def list_to_comma_separated(self, keywords):
@@ -154,15 +156,8 @@ class SummarizeCard(URLCard):
  
     def form(self):
        return super().form() + [
-          { 'name':"prompt", 'label':"Prompt:", 'type':"text", 'list':"prompts", 'value': self.prompt }
+          { 'name':'prompt', 'label':"Prompt:", 'type':"text", 'list':"prompts", 'value': self.prompt }
        ]
- 
-    def pre_process(self):
-       super().pre_process()
-       if self.prompt:
-          session['prompt'] = self.prompt
-       elif 'prompt' in session:
-          self.prompt = session['prompt']
  
     def process(self):
        super().process()
@@ -178,24 +173,13 @@ class AskCard(BaseCard):
  
     def form(self):
        return super().form() + [
-           { 'name':"question", 'label':"Question:", 'type':"text", 'value': self.question },
-           { 'name':"context", 'label':"Context:", 'type':"text", 'value': self.context, 'tag':'textarea' }
+           { 'name':'question', 'label':'Question:', 'type':'text', 'value': self.question , 'tag': 'textarea'},
+           { 'name':'context', 'label':'Context:', 'type':'text', 'value': self.context, 'tag':'textarea' }
        ]
- 
-    def pre_process(self):
-       super().pre_process()
-       if self.question:
-          session['question'] = self.question
-       elif 'question' in session:
-          self.question = session['question']
-       if self.context:
-          session['context'] = self.context
-       elif 'context' in session:
-          self.context = session['context']
  
     def process(self):
        super().process()
-       self.answer = check_output([ASK_BIN, "any", self.question], input=self.context.encode("utf-8")).decode('utf-8')
+       self.answer = check_output([ASK_BIN, 'any', self.question], input=self.context.encode('utf-8')).decode('utf-8')
        return self.get_template()
  
  
@@ -238,7 +222,7 @@ def card_router(card_constructor):
     ## todo: these lifecycle calls are non-standard and somewhat confusing
     card = card_constructor()
     card.pre_process()
-    if request.method == "POST":
+    if request.method == 'POST':
        result = card.process()
        if result is not None:
           return result
@@ -260,12 +244,12 @@ CARDS = {
 @app.route("/")
 def root():
     # clear session on root card
-    session['url'] = None
-    session['question'] = None
-    session['context'] = None
+    session['url'] = ''
+    session['question'] = ''
+    session['context'] = ''
     return redirect(url_for('route_card', card='home'))
 
-@app.route("/card/<card>", methods=["GET", "POST"])
+@app.route("/card/<card>", methods=['GET', 'POST'])
 def route_card(card):
    return card_router(CARDS.get(card, ErrorCard))
 
