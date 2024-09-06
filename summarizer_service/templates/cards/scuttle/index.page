@@ -6,7 +6,7 @@
 <p>
 
 <div class="tab-container">
-  <button type="submit" class="tab-button active" id="submit-button" form="mainform">Answer</button>
+  <button type="submit" class="tab-button active" id="submit-button" form="mainform">Scuttle</button>
 </div>
 
 {% endblock %}
