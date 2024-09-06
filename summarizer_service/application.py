@@ -12,6 +12,14 @@ import base64
 from urllib.parse import quote_plus
 from .config import *
 
+MAIN_HEADER = {
+    "/card/home": "Home",
+    "/card/scuttle": "Scuttle",
+    "/card/summarize": "Summarize",
+    "/card/ask": "Ask",
+    "/card/via-api-model": "Via API Models"
+}
+
 app = None
 
 def create_app():
@@ -41,7 +49,7 @@ class BaseCard:
         self.stats = self.get_stats()
 
     def get_template(self):
-        return render_template(self.template, card=self)
+        return render_template(self.template, card=self, main_header=MAIN_HEADER)
 
     def pre_process(self):
         # Extract the specified request parameters and set them as attributes of self and session

@@ -7,8 +7,7 @@
     <label for="model_name">Model Name:</label>
     <select id="model_name" name="model_name">
       {% for model_name in card.models_list %}
-      <!-- {{model_name}} == {{card.stats.model_name}} -->
-      <option value="{{model_name}}" {% if model_name == card.stats.model_name %}selected{% endif %}>{{model_name}}</option>
+      <option value="{{model_name|escape}}" {% if model_name == card.stats.model_name %}selected{% endif %}>{{model_name|escape}}</option>
       {% endfor %}
     </select>
   </div>

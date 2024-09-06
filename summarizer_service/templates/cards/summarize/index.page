@@ -2,16 +2,9 @@
 {% block title %}Summarizer{% endblock %}
 {% block h1 %}Summarizer{% endblock %}
 {% block content %}
-<form id="mainform" method="POST">
-  <div id="grid">
-    {% for field in card.form() %}
-      <label for="{{ field['name'] }}">{{ field['label'] }}</label>
-      <input {% for attr in field.items() %}{{attr[0]}}="{{attr[1]}}" {% endfor %} />
-    {% endfor %}
-  </div>
-  <div id="loading"></div>
-</form>
 <p />
+
+{% include 'cards/main-form.body' %}
 
 <div class="tab-container">
   <button type="submit" class="tab-button active" id="submit-button" form="mainform">Summarize</button>
@@ -32,7 +25,7 @@
 
 <datalist id="prompts">
   {% for value in card.prompts %}
-    <option value="{{value}}">
+    <option value="{{value|escape}}">
   {% endfor %}
 </datalist>
 {% endblock %}
