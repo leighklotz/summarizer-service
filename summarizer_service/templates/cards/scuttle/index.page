@@ -1,5 +1,13 @@
 {% extends "cards/card-base.page" %}
 {% block title %}Scuttle{% endblock %}
 {% block h1 %}Scuttle{% endblock %}
-{% block content %}{% include 'cards/main-form.body' %}{% endblock %}
+{% block content %}
+{% include 'cards/main-form.body' %}
+<p>
+
+<div class="tab-container">
+  <button type="submit" class="tab-button active" id="submit-button" form="mainform">Answer</button>
+</div>
+
+{% endblock %}
 {% block helpbody %}{% include('cards/scuttle/help.body') %}{% endblock %}
