@@ -127,7 +127,7 @@ class ScuttleCard(URLCard):
     def call_scuttle(self, url):
         if not (url.startswith('http://') or url.startswith('https://')):
             raise ValueError("Unsupported URL type", url)
-        output = check_output([SCUTTLE_BIN, '--json', url]).decode('utf-8')
+        output = check_output([SCUTTLE_BIN, '--json', quote_plus(url)]).decode('utf-8')
         app.logger.info(f"*** scuttle {url=} {output=}")
         try:
             result = json.loads(output)
