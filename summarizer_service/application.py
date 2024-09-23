@@ -37,6 +37,9 @@ def create_app():
 
     return app
 
+def validate_url(url: str) -> bool:
+    return url.startswith('http://') or url.startswith('https://')
+
 app = create_app()
 
 class BaseCard:
@@ -109,9 +112,9 @@ class URLCard(BaseCard):
 
     def process(self):
         if self.url:
-            if not (self.url.startswith('http://') or self.url.startswith('https://')):
+            if not validate_url(self.url):
                 raise ValueError("Unsupported URL type", self.url)
-            return None
+        return None
                                     
 class ScuttleCard(URLCard):
     def __init__(self):
@@ -126,7 +129,7 @@ class ScuttleCard(URLCard):
             return self.get_template()
 
     def call_scuttle(self, url: str):
-        if not (url.startswith('http://') or url.startswith('https://')):
+        if not validate_url(self.url):
             raise ValueError("Unsupported URL type", url)
         output = check_output([SCUTTLE_BIN, '--json', quote_plus(url)]).decode('utf-8')
         app.logger.info(f"*** scuttle {url=} {output=}")
