@@ -2,6 +2,7 @@
 # Copyright 2024 Leigh Klotz
 # A web application that provides LLM-based text web page summarization for bookmarking services using Flask, subprocesses, and custom scripts.
 
+from typing import List, Dict, Any
 import logging
 import os
 from flask import Flask, request, redirect, render_template, jsonify, url_for, session
@@ -43,7 +44,7 @@ class BaseCard:
     API_FLAG = 'api'
     GET_MODEL_NAME_FLAG = '--get-model-name'
 
-    def __init__(self, template, params=[]):
+    def __init__(self, template: str, params: List[str]=[]):
         self.template = template
         self.params = params
         self.stats = self.get_stats()
@@ -80,13 +81,13 @@ class BaseCard:
             'model_link': self._determine_model_link(via, model_type)
         }
 
-    def _get_via_script(self, script_bin, *args):
+    def _get_via_script(self, script_bin: str, *args):
         try:
             return (check_output([script_bin] + list(args)).decode('utf-8') or '').strip()
         except CalledProcessError:
             return None
 
-    def _determine_model_link(self, via, model_type):
+    def _determine_model_link(self, via: str, model_type: str):
         return OPENAPI_UI_SERVER if via == 'api' else LLAMAFILES_LINK
 
     def get_stats(self):
@@ -97,7 +98,7 @@ class BaseCard:
         return stats
 
 class URLCard(BaseCard):
-    def __init__(self, template, params=[]):
+    def __init__(self, template: str, params: List[str]=[]):
         self.url = ''
         super().__init__(template=template, params=(params + ['url']))
 
@@ -124,7 +125,7 @@ class ScuttleCard(URLCard):
         else:
             return self.get_template()
 
-    def call_scuttle(self, url):
+    def call_scuttle(self, url: str):
         if not (url.startswith('http://') or url.startswith('https://')):
             raise ValueError("Unsupported URL type", url)
         output = check_output([SCUTTLE_BIN, '--json', quote_plus(url)]).decode('utf-8')
@@ -136,7 +137,7 @@ class ScuttleCard(URLCard):
             raise
         return result
 
-    def decode_scuttle_output(self, data):
+    def decode_scuttle_output(self, data: Dict[str, str]):
        # Decode the output from the Scuttle tool
        link = data['link']
        title = data['title']
@@ -145,7 +146,7 @@ class ScuttleCard(URLCard):
        url = f'https://scuttle.klotz.me/bookmarks/klotz?action=add&address={quote_plus(link)}&description={quote_plus(description)}&title={quote_plus(title)}&tags={quote_plus(tags)}'
        return url
  
-    def list_to_comma_separated(self, keywords):
+    def list_to_comma_separated(self, keywords: List[str]):
        # Convert a list of keywords to a comma-separated string
        if isinstance(keywords, list):
           return ', '.join(keywords)
@@ -240,7 +241,7 @@ def card_router(card_constructor):
     else:
        return card.get_template()
     
-CARDS = {
+CARDS: Dict[str,BaseCard] = {
     'home': HomeCard,
     'scuttle': ScuttleCard,
     'summarize': SummarizeCard,
