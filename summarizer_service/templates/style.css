@@ -1,15 +1,26 @@
 body { margin-left: 4pt; }
-#grid { 
-    display: grid; 
-    grid-template-columns: auto 1fr; 
-    gap: 10px;
-    align-items: center;
-}
+
 label, button { font-weight: bold; }
-#grid input { width: 50%; }
-#grid textarea { width: 50%; }
 button { grid-column: span 1; margin-top: 10px; }
 
 b, strong { font-weight: bold; text-shadow: 1px 1px 0px #888; }
-	    
 
+#grid {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+}
+
+#grid textarea {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#grid textarea[name="question"] {
+    height: 8em; /* Approximately 4 lines tall */
+}
+
+#grid textarea[name="context"] {
+    height: 4em; /* Approximately 2 lines tall */
+}
