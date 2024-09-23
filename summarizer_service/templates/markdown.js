@@ -106,11 +106,17 @@ document.addEventListener("DOMContentLoaded", function() {
     function selectMarkdownTab() {
 	activateTab(markdownTab, markdownText);
 
-	let it = rawText.innerText;
-	let tv = convertMarkdownTable(it);
-        let v = marked.parse(tv);
-	let vs = sanitize_dom(v);
-        markdownText.innerHTML = v;
+	MathJax.typesetPromise([rawText]).then(() => {
+	    console.log("MathJax rendering complete.");
+	    let it = rawText.innerText;
+	    let tv = convertMarkdownTable(it);
+            let v = marked.parse(tv);
+ 	    let vs = sanitize_dom(v);
+            markdownText.innerHTML = v;
+	}).catch((err) => {
+	    console.error("MathJax rendering error:", err.message);
+	});
+
     }
 
     const tabEvents = {
