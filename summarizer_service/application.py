@@ -218,7 +218,8 @@ class HomeCard(BaseCard):
         super().__init__(template='cards/home/index.page')
 
     def get_template(self):
-        # clear previous args on hoem card
+        # clear session on home card
+        clear_session()
         return super().get_template()
 
 class ErrorCard(BaseCard):
@@ -248,13 +249,14 @@ CARDS = {
     'error': ErrorCard
 }
 
-### Routes
-@app.route("/")
-def root():
-    # clear session on root card
+def clear_session():
     session['url'] = ''
     session['question'] = ''
     session['context'] = ''
+
+### Routes
+@app.route("/")
+def root():
     return redirect(url_for('route_card', card='home'))
 
 @app.route("/card/<card>", methods=['GET', 'POST'])
