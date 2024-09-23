@@ -1,16 +1,64 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const textTab = document.getElementById('textTab');
-    const markdownTab = document.getElementById('markdownTab');
-    const input = document.getElementById('rawText');
-    const output = document.getElementById('output');
+function activateTab(a_tab, a_display) {
+    const tabs = [rawTextTab, markdownTab, plainTextTab];
+    const displays = [rawText, markdownText, plainText];
 
-    function selectTextTab() {
-        textTab.classList.add('active');
-        markdownTab.classList.remove('active');
-	output.classList.remove('display');
-        output.classList.add('hide');
-        input.classList.remove('hide');
-        input.classList.add('display');
+    for (let tab of tabs) {
+	if (tab === a_tab) {
+	    tab.classList.add('active');
+	} else {
+	    tab.classList.remove('active');
+	}
+    }
+
+    for (let display of displays) {
+	if (display === a_display) {
+	    display.classList.remove('hide');
+	    display.classList.add('display');
+	} else {
+	    display.classList.remove('display');
+	    display.classList.add('hide');
+	}
+    }
+}
+
+
+function activateTab(a_tab, a_display) {
+    const tabs = [rawTextTab, markdownTab, plainTextTab];
+    const displays = [rawText, markdownText, plainText];
+
+    for (let tab of tabs) {
+        if (tab === a_tab) {
+	    tab.classList.add('active');
+        } else {
+	    tab.classList.remove('active');
+        }
+    }
+
+    for (let display of displays) {
+        if (display === a_display) {
+	    display.classList.remove('hide');
+	    display.classList.add('display');
+        } else {
+	    display.classList.remove('display');
+	    display.classList.add('hide');
+        }
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const rawTextTab = document.getElementById('rawTextTab');
+    const plainTextTab = document.getElementById('plainTextTab');
+    const markdownTab = document.getElementById('markdownTab');
+    const rawText = document.getElementById('rawText');
+    const plainText = document.getElementById('plainText');
+    const markdownText = document.getElementById('markdownText');
+
+    function selectRawTextTab() {
+	activateTab(rawTextTab, rawText);
+    }
+
+    function selectPlainTextTab() {
+        activateTab(plainTextTab, plainText);
     }
 
     // Convert Markdown table with custom ||a||b||c|| headers to marked format single pipes
@@ -50,34 +98,34 @@ document.addEventListener("DOMContentLoaded", function() {
 	    .join('\n');
     }
 
-    function selectMarkdownTab() {
-        markdownTab.classList.add('active');
-        textTab.classList.remove('active');
+    function sanitize_dom(v) {
+	// todo: dom sanitize
+	return v;
+    }
 
-        // todo: dom sanitize
-	let it = input.innerText;
+    function selectMarkdownTab() {
+	activateTab(markdownTab, markdownText);
+
+	let it = rawText.innerText;
 	let tv = convertMarkdownTable(it);
         let v = marked.parse(tv);
-        output.innerHTML = v;
-
-        output.classList.add('display');
-        output.classList.remove('hide');
-        input.classList.add('hide');
-        input.classList.remove('display');
-
+	let vs = sanitize_dom(v);
+        markdownText.innerHTML = v;
     }
 
-    if (textTab)  {
-        textTab.addEventListener('click', selectTextTab);
-    }
+    const tabEvents = {
+	rawTextTab: selectRawTextTab,
+	plainTextTab: selectPlainTextTab,
+	markdownTab: selectMarkdownTab
+    };
 
-    if (markdownTab) {
-        markdownTab.addEventListener('click', selectMarkdownTab);
+    for (const [tabName, eventHandler] of Object.entries(tabEvents)) {
+	const tabElement = window[tabName];
+	if (tabElement) {
+            tabElement.addEventListener('click', eventHandler);
+	}
     }
-
     if (markdownTab) {
 	selectMarkdownTab();
     }
 });
-
-    

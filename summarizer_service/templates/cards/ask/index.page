@@ -8,18 +8,21 @@
 <div class="tab-container">
   <button type="submit" class="tab-button active" id="submit-button" form="mainform">Answer</button>
 {%if card.answer %}
-  <a href="#" class="tab-button" id="markdownTab">Markdown</a>
-  <a href="#" class="tab-button active" id="textTab">Text</a>
+  <a href="#" class="tab-button active" id="markdownTab">Markdown</a>
+  <a href="#" class="tab-button"        id="plainTextTab">Plain Text</a>
+  <a href="#" class="tab-button"        id="rawTextTab">Raw Text</a>
 {% endif %}
 </div>
 
 {%if card.answer %}
-<div id="output" class="form-control display"></div>
-  <!-- avoid adding indentation to markdown paras -->
-  <div id="rawText" class="form-control hide">{% for para in card.answer.split('\n') %}
-{{para}}
+<div id="markdownText" class="form-control display"></div>
+
+<div id="plainText" class="form-control hide">{% for para in card.answer.split('\n') %}
+{{para}}<br />
 {% endfor %}
-    </div>
+</div>
+
+<div id="rawText" class="form-control hide">{{ card.answer }}</div>
 {% endif %}
 
 {% endblock %}

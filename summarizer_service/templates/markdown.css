@@ -1,6 +1,7 @@
-#rawText.display { display: block; }
+#rawText.display { display: block; white-space: pre; }
 #rawText.hide { display: none; }
-#output.hide { display: none; }
-#output.display { display: block; }
-
+#plainText.display { display: block; }
+#plainText.hide { display: none; }
+#markdownText.display { display: block; }
+#markdownText.hide { display: none; }
 
