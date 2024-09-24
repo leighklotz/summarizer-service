@@ -2,15 +2,18 @@
 # Copyright 2024 Leigh Klotz
 # A web application that provides LLM-based text web page summarization for bookmarking services using Flask, subprocesses, and custom scripts.
 
-from typing import List, Dict, Any
 import logging
 import os
-from flask import Flask, request, redirect, render_template, jsonify, url_for, session
-from subprocess import check_output, CalledProcessError
 import json
 import yaml
 import base64
 from urllib.parse import quote_plus
+from subprocess import check_output, CalledProcessError
+import shlex
+
+from flask import Flask, request, redirect, render_template, jsonify, url_for, session
+
+from typing import List, Dict, Any
 from .config import *
 
 MAIN_HEADER = {
@@ -131,7 +134,7 @@ class ScuttleCard(URLCard):
     def call_scuttle(self, url: str):
         if not validate_url(self.url):
             raise ValueError("Unsupported URL type", url)
-        output = check_output([SCUTTLE_BIN, '--json', quote_plus(url)]).decode('utf-8')
+        output = check_output([SCUTTLE_BIN, '--json', shlex.quote(url)]).decode('utf-8')
         app.logger.info(f"*** scuttle {url=} {output=}")
         try:
             result = json.loads(output)
