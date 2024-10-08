@@ -163,7 +163,12 @@ class ScuttleCard(URLCard):
  
 class SummarizeCard(URLCard):
     prompts = [ "", "Summarize", "Answer the question in the title in one sentence", "Summarize as bullet points",
-                "Summarize the main points", "What is unusual about this?", "Write help text to add to this web page" ]
+                "Summarize the main points", "What is unusual about this?", "Write help text to add to this web page",
+                # https://old.reddit.com/r/LocalLLaMA/comments/1ftjbz3/shockingly_good_superintelligent_summarization/
+                # /u/Flashy_Management962
+                """1.) Analyze the input text and generate 5 essential questions that, when answered, capture the main points and core meaning of the text.
+2.) When formulating your questions: a. Address the central theme or argument b. Identify key supporting ideas c. Highlight important facts or evidence d. Reveal the author's purpose or perspective e. Explore any significant implications or conclusions.
+3.) Answer all of your generated questions one-by-one in detail."""]
     def __init__(self):
        super().__init__(template='cards/summarize/index.page', params=['prompt'])
        self.prompt = 'Summarize'
