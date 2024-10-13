@@ -283,6 +283,8 @@ CARDS: Dict[str,BaseCard] = {
 }
 
 def clear_session():
+    session.clear() 
+    session.modified = True
     session['url'] = ''
     session['question'] = ''
     session['context'] = ''
