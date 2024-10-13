@@ -5,7 +5,7 @@
     {% set tag = field.get('tag', 'input')  %}
     {% if tag == 'input': %}
     <{{tag}} {% for attr in field.items() %}{{attr[0]|escape}}="{{attr[1]|escape}}" {% endfor %}></{{tag}}>
-    {% elif tag == 'textarea': %}
+    {% elif tag in ['textarea', 'button'] %}
     <{{tag}} {% for attr in field.items() %}{{attr[0]}}="{{attr[1]}}" {% endfor %}>{{field.get('value', '')}}</{{tag}}>
     {% endif %}
     {% endfor %}

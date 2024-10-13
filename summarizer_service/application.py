@@ -214,7 +214,8 @@ class AskCard(BaseCard):
     def form(self):
        return super().form() + [
            { 'name':'question', 'label':'Question:', 'type':'text', 'value': self.question , 'tag': 'textarea'},
-           { 'name':'context', 'label':'Context:', 'type':'text', 'value': self.context, 'tag':'textarea' }
+           { 'name':'context', 'label':'Context:', 'type':'text', 'value': self.context, 'tag':'textarea' },
+           { 'tag':'button', 'type':'button', 'id':'clear-context', 'class':'clear-button', 'value':'[X]' }
        ]
  
     def process(self):
