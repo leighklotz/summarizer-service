@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE}")")"
+cd "${SCRIPT_DIR}"
 
 # export SECRET_KEY="$(python3 -c 'import os; print(os.urandom(24).hex())')"
 export SECRET_KEY="$(openssl rand -hex 24)"
