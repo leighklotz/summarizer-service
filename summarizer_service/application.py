@@ -3,6 +3,7 @@
 # A web application that provides LLM-based text web page summarization for bookmarking services using Flask, subprocesses, and custom scripts.
 
 import logging
+import tempfile
 import os
 import json
 import yaml
@@ -125,23 +126,41 @@ class ScuttleCard(URLCard):
 
     def process(self):
         super().process()
-        scuttle_url = self.decode_scuttle_output(self.call_scuttle(self.url))
+        capture_filename = tempfile.mktemp(dir='/tmp')
+        data, full_text = self.call_scuttle(self.url, capture_filename)
+        scuttle_url = self.decode_scuttle_output(data)
+        if full_text:
+            session['context'] = full_text
         if scuttle_url:
             return redirect(scuttle_url)
         else:
             return self.get_template()
 
-    def call_scuttle(self, url: str):
+    def call_scuttle(self, url: str, capture_filename: str = None):
         if not validate_url(self.url):
             raise ValueError("Unsupported URL type", url)
-        output = check_output([SCUTTLE_BIN, '--json', shlex.quote(url)]).decode('utf-8')
-        app.logger.info(f"*** scuttle {url=} {output=}")
+        full_text = None
+
+        output = check_output([SCUTTLE_BIN, '--capture-file', capture_filename, '--json', shlex.quote(url)]).decode('utf-8')
+        app.logger.info(f"*** scuttle {url=} {output=} {capture_filename=}")
+
         try:
             result = json.loads(output)
         except json.JSONDecodeError:
             app.logger.error(f"*** [ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE")
             raise
-        return result
+
+        if capture_filename:
+            try:
+                with open(capture_filename, 'r') as file:
+                    full_text = file.read()
+            except Exception as e:
+                app.logger.error(f"*** [ERROR] could not read captured file; {e}")
+            finally:
+                if os.path.exists(capture_filename):
+                    os.remove(capture_filename)
+
+        return result, full_text
 
     def decode_scuttle_output(self, data: Dict[str, str]):
        # Decode the output from the Scuttle tool
