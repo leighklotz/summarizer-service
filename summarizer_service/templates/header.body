@@ -16,6 +16,7 @@
     <script>{% include('loading.js') %}</script>
 
     <script>{% include('context.js') %}</script>
+    <style>{% include('context.css') %}</style>
 
     <style>{% include('markdown.css') %}</style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>

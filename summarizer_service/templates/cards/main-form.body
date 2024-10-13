@@ -1,13 +1,11 @@
 <form id="mainform" method="POST">
   <div id="grid">
     {% for field in card.form() %}
-    <label for="{{ field['name']|escape }}">{{ field['label']|escape }}</label>
     {% set tag = field.get('tag', 'input')  %}
+    <label for="{{ field['name']|escape }}-{{ tag|escape }}">{{ field['label']|escape }}</label>
     {% if tag == 'input': %}
-    <{{tag}} {% for attr in field.items() %}{{attr[0]|escape}}="{{attr[1]|escape}}" {% endfor %}></{{tag}}>
-    {% elif tag in ['textarea', 'button'] %}
-    <{{tag}} {% for attr in field.items() %}{{attr[0]}}="{{attr[1]}}" {% endfor %}>{{field.get('value', '')}}</{{tag}}>
-    {% endif %}
+    <{{tag}} {% for key, value in field.items() %}{% if key != 'tag' %}{{key|escape}}="{{value|escape}}" {% endif %}{% endfor %}></{{tag}}>
+    {% elif tag in ['textarea', 'button'] %}<{{tag}} {% for key, value in field.items() %}{% if key != 'tag' %}{{key}}="{{value}}" {% endif %}{% endfor %}>{{field.get('value', '')}}</{{tag}}>{% endif %}
     {% endfor %}
   </div>
   <div id="loading"></div>

@@ -1,0 +1,23 @@
+#grid textarea[name="context"] {
+    height: 4em; /* Approximately 2 lines tall */
+    flex: 1; /* Allow it to grow */
+    position: relative; /* Position relative for positioning the button */
+}
+
+#grid textarea[name="context"]::after {
+    content: "[X]"; /* Text for the clear button */
+    position: absolute; /* Position it absolutely within the textarea */
+    right: 10px; /* Adjust distance from the right edge */
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%); /* Adjust for vertical centering */
+    padding: 2px 5px; /* Padding for the button appearance */
+    background: #333; /* Button background color */
+    color: #fff; /* Button text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+#grid textarea[name="context"]::after:hover {
+    background: #555; /* Darker background on hover */
+}

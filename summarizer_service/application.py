@@ -196,7 +196,7 @@ class SummarizeCard(URLCard):
  
     def form(self):
        return super().form() + [
-          { 'name':'prompt', 'label':"Prompt:", 'type':"text", 'list':"prompts", 'value': self.prompt }
+          { 'name':'prompt', id:'prompt-input', 'label':"Prompt:", 'type':"text", 'list':"prompts", 'value': self.prompt }
        ]
  
     def process(self):
@@ -213,9 +213,8 @@ class AskCard(BaseCard):
  
     def form(self):
        return super().form() + [
-           { 'name':'question', 'label':'Question:', 'type':'text', 'value': self.question , 'tag': 'textarea'},
-           { 'name':'context', 'label':'Context:', 'type':'text', 'value': self.context, 'tag':'textarea' },
-           { 'tag':'button', 'type':'button', 'id':'clear-context', 'class':'clear-button', 'value':'[X]' }
+           { 'name':'question','id':'question-textarea', 'label':'Question:', 'type':'text', 'value': self.question , 'tag': 'textarea'},
+           { 'name':'context', 'id':'context-textarea', 'label':'Context:', 'type':'text', 'value': self.context, 'tag':'textarea' }
        ]
  
     def process(self):
