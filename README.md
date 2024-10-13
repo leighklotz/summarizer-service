@@ -98,5 +98,8 @@ Ask a question with optional context (defaults to current selection) and open a 
 javascript:(  function() %7B    var x = document;    var d = encodeURIComponent(window.getSelection()).replace(/%20/g, '+');    open('https://nuc1-psy.klotz.me/card/ask?question=context=%27%20+%20d,%20%27Ask20-%20example.com%27,%20%27modal=1,status=0,scrollbars=1,toolbar=0,resizable=1,width=790,height=465,left=%27%20+%20(screen.width-790)/2%20+%20%27,top=%27%20+%20(screen.height-425)/2);%20%20%7D)();
 ```
 
+# Sessions
+See `flask_sessions/` for session data, which will accumulate files, some containtining the contents of form fields. You will need to protect the files and delete them periodically.
+
 ### License
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
