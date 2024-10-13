@@ -13,6 +13,7 @@ from subprocess import check_output, CalledProcessError
 import shlex
 
 from flask import Flask, request, redirect, render_template, jsonify, url_for, session
+from flask_session import Session
 
 from typing import List, Dict, Any
 from .config import *
@@ -38,7 +39,7 @@ def create_app():
             except KeyError:
                 raise ValueError("No 'SECRET_KEY' specified in environment variables; sessions will not work.")
         app.config['SESSION_TYPE'] = 'filesystem'
-
+    Session(app)
     return app
 
 def validate_url(url: str) -> bool:
