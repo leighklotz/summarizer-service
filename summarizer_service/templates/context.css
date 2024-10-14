@@ -1,6 +1,5 @@
 #grid textarea[name="context"] {
-    height: 4em; /* Approximately 2 lines tall */
-    flex: 1; /* Allow it to grow */
+    height: 8em; /* Approximately 4 lines tall */
     position: relative; /* Position relative for positioning the button */
 }
 
