@@ -127,15 +127,21 @@ class ScuttleCard(URLCard):
 
     def process(self):
         super().process()
-        capture_filename = tempfile.mktemp(dir='/tmp')
-        data, full_text = self.call_scuttle(self.url, capture_filename)
-        scuttle_url = self.decode_scuttle_output(data)
-        if full_text:
-            session['context'] = full_text
-        if scuttle_url:
-            return redirect(scuttle_url)
-        else:
-            return self.get_template()
+
+        with tempfile.NamedTemporaryFile(dir='/tmp', delete=False) as temp_file:
+            capture_filename = temp_file.name
+            try:
+                data, full_text = self.call_scuttle(self.url, capture_filename)
+                scuttle_url = self.decode_scuttle_output(data)
+                if full_text:
+                    session['context'] = full_text
+                if scuttle_url:
+                    return redirect(scuttle_url)
+                else:
+                    return self.get_template()
+            finally:
+                if os.path.exists(capture_filename):
+                    os.unlink(capture_filename)
 
     def call_scuttle(self, url: str, capture_filename: str = None):
         if not validate_url(self.url):
@@ -283,10 +289,10 @@ CARDS: Dict[str,BaseCard] = {
 
 def clear_session():
     session.clear() 
-    session.modified = True
     session['url'] = ''
     session['question'] = ''
     session['context'] = ''
+    session.modified = True
 
 ### Routes
 @app.route("/")
