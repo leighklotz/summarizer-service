@@ -13,6 +13,7 @@
 
 .clear-button {
     position: absolute;
+    margin-top: 0;
     right: 2px;
     top: 2px;
     cursor: pointer;
@@ -20,7 +21,6 @@
     color: #000000; /* Changed the text color to black */
     border: none;
     padding: 5px;
-    border-radius: 50%;
     font-family: 'Courier New', Courier, monospace; /* Changed the font to a monospace simple tech font */
     text-align: center; /* Centered the text inside the button */
     font-size: 16px; /* Adjusted the font size for better visibility */
@@ -28,5 +28,5 @@
 }
 
 .clear-button:hover {
-    background-color: #ff1a1a;
+    background-color: #A7B31E;
 }

@@ -4,7 +4,7 @@
     {% set tag = field.get('tag', 'input')  %}
     <label for="{{ field['name']|escape }}-{{ tag|escape }}">{{ field['label']|escape }}</label>
     {% if tag == 'input' %}<{{tag}} {% for key, value in field.items() %}{% if key != 'tag' %}{{key|escape}}="{{value|escape}}"{% endif %}{% endfor %}></{{tag}}>
-    {% elif tag == 'textarea' %}<div id="{{field['name']|escape}}-{{tag}}-div" class="clear-div"><{{tag}} {% for key, value in field.items() %}{% if key != 'tag' %}{{key}}="{{value}}" {% endif %}{% endfor %}>{{field.get('value', '')}}</{{tag}}><button class="clear-button" type="button" onclick="clearTextarea(this)">[X]</button></div>{% endif %}
+    {% elif tag == 'textarea' %}<div id="{{field['name']|escape}}-{{tag}}-div" class="clear-div"><{{tag}} {% for key, value in field.items() %}{% if key != 'tag' %}{{key}}="{{value}}" {% endif %}{% endfor %}>{{field.get('value', '')}}</{{tag}}><button class="clear-button" type="button" onclick="toggleTextareaContent(this)">[X]</button></div>{% endif %}
 
 {% endfor %}
   </div>
