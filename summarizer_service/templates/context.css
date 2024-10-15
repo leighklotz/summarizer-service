@@ -1,22 +1,32 @@
-#grid textarea[name="context"] {
+#context-textarea-div, #question-textarea-div {
     height: 8em; /* Approximately 4 lines tall */
-    position: relative; /* Position relative for positioning the button */
+    position: relative;
 }
 
-#grid textarea[name="context"]::after {
-    content: "[X]"; /* Text for the clear button */
-    position: absolute; /* Position it absolutely within the textarea */
-    right: 10px; /* Adjust distance from the right edge */
-    top: 50%; /* Center vertically */
-    transform: translateY(-50%); /* Adjust for vertical centering */
-    padding: 2px 5px; /* Padding for the button appearance */
-    background: #333; /* Button background color */
-    color: #fff; /* Button text color */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
+#context-textarea-div textarea {
+    width: 100%;
+    padding: 10px;
+    padding-right: 30px; /* Room for the clear button */
+    box-sizing: border-box;
+    resize: none;
 }
 
-#grid textarea[name="context"]::after:hover {
-    background: #555; /* Darker background on hover */
+.clear-button {
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    cursor: pointer;
+    background-color: #ffffff;
+    color: #000000; /* Changed the text color to black */
+    border: none;
+    padding: 5px;
+    border-radius: 50%;
+    font-family: 'Courier New', Courier, monospace; /* Changed the font to a monospace simple tech font */
+    text-align: center; /* Centered the text inside the button */
+    font-size: 16px; /* Adjusted the font size for better visibility */
+    line-height: 1; /* Ensured the text is not vertically compressed */
+}
+
+.clear-button:hover {
+    background-color: #ff1a1a;
 }
