@@ -20,7 +20,3 @@ b, strong { font-weight: bold; text-shadow: 1px 1px 0px #888; }
 #grid textarea[name="question"] {
     height: 8em; /* Approximately 4 lines tall */
 }
-
-#grid textarea[name="context"] {
-    height: 4em; /* Approximately 2 lines tall */
-}

@@ -1,0 +1,32 @@
+#context-textarea-div, #question-textarea-div {
+    height: 8em; /* Approximately 4 lines tall */
+    position: relative;
+}
+
+#context-textarea-div textarea, #question-textarea-div textarea {
+    width: 100%;
+    padding: 10px;
+    padding-right: 30px; /* Room for the clear button */
+    min-height: 3em;
+    resize: vertical;
+}
+
+.clear-button {
+    position: absolute;
+    margin-top: 0;
+    right: 2px;
+    top: 2px;
+    cursor: pointer;
+    background-color: #ffffff;
+    color: #000000;
+    border: none;
+    padding: 5px;
+    font-family: 'Courier New', Courier, monospace;
+    text-align: center;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.clear-button:hover {
+    background-color: #A7B31E;
+}
