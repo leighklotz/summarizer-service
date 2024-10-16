@@ -9,6 +9,7 @@
       <li>Click the "<strong>Answer</strong>" button to get the answer.</li>
       <li>Wait for the answer to be displayed below the buttons.</li>
       <li>Click on the newly-appearing tab buttons for Text and Markdown to see those views of the response.</li>
+      <li>Click <tt>[X]</tt> to clear the Question or Context, and click <tt>&lt;!&gt;</tt> to restore.</li>
     </ol>
     <p>Enjoy the convenience of quickly answered questions!</p>
   </div>
