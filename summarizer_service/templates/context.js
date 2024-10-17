@@ -11,7 +11,7 @@ function toggleTextareaContent(button) {
     if (button.textContent === "[X]") {
         textareaUndo[textarea.id] = textarea.value;
         button.textContent = "<!>";
-        textarea.value = '';
+        textarea.value = ' ';	// hack to make sure it gets sent in the POST and is not empty
     }
     else if (button.textContent === "<!>") {
         // If the button text content is <!>, restore the textarea content
@@ -27,7 +27,7 @@ function toggleTextareaContent(button) {
             textarea.value = undo_value;
         } else {
             // Clear the textarea if there is no saved content
-            textarea.value = '';
+            textarea.value = ' '; // repeat workaround to override server-side session vars
         }
         button.textContent = "[X]";
     }

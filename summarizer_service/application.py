@@ -3,13 +3,14 @@
 # A web application that provides LLM-based text web page summarization for bookmarking services using Flask, subprocesses, and custom scripts.
 
 import logging
-import tempfile
 import os
 import json
 import yaml
 import base64
+
 from urllib.parse import quote_plus
 from subprocess import check_output, CalledProcessError
+from tempfile import NamedTemporaryFile
 import shlex
 
 from flask import Flask, request, redirect, render_template, jsonify, url_for, session
@@ -61,17 +62,19 @@ class BaseCard:
         return render_template(self.template, card=self, main_header=MAIN_HEADER)
 
     def pre_process(self):
-        # Extract the specified request parameters and set them as attributes of self and session
-        for param in self.params:
-            value = request.args.get(param, request.form.get(param, ''))
-            if value:
-                setattr(self, param, value) 
-                session[param] = value
+        for param in request.args:  
+            value = request.args.get(param)
+            setattr(self, param, value) 
+            session[param] = value
 
-        # Replace empty self params with values from session
+        for param in request.form:
+            value = request.form.get(param)
+            setattr(self, param, value) 
+            session[param] = value
+
         for param in self.params:
             if not getattr(self, param) and param in session:
-                setattr(self, param, session[param])
+                setattr(self, param, session[param]) 
 
     def process(self):
         return self.get_template()
@@ -105,6 +108,14 @@ class BaseCard:
         stats.update(model_info)
         return stats
 
+    def read_file(self, fn):
+        try:
+            with open(fn, 'r') as file:
+                return file.read()
+        except Exception as e:
+            logger.error(f"*** [ERROR] could not read file {fn=}; {e}")
+            raise
+
 class URLCard(BaseCard):
     def __init__(self, template: str, params: List[str]=[]):
         self.url = ''
@@ -128,46 +139,31 @@ class ScuttleCard(URLCard):
     def process(self):
         super().process()
 
-        with tempfile.NamedTemporaryFile(dir='/tmp', delete=False) as temp_file:
-            capture_filename = temp_file.name
+        data, full_text = self.call_scuttle(self.url)
+        scuttle_url = self.decode_scuttle_output(data)
+        if full_text:
+            session['context'] = full_text
+            if scuttle_url:
+                return redirect(scuttle_url)
+            else:
+                return self.get_template()
+
+    def call_scuttle(self, url: str):
+        if not validate_url(url):
+            raise InvalidURLException(f"Unsupported URL type: {url}")
+
+        with NamedTemporaryFile(dir='/tmp', delete=True) as temp:
+            capture_filename = temp.name
+            output = check_output([SCUTTLE_BIN, '--capture-file', capture_filename, '--json', shlex.quote(url)]).decode('utf-8')
+            logger.info(f"*** scuttle {url=} {output=} {capture_filename=}")
+
             try:
-                data, full_text = self.call_scuttle(self.url, capture_filename)
-                scuttle_url = self.decode_scuttle_output(data)
-                if full_text:
-                    session['context'] = full_text
-                if scuttle_url:
-                    return redirect(scuttle_url)
-                else:
-                    return self.get_template()
-            finally:
-                if os.path.exists(capture_filename):
-                    os.unlink(capture_filename)
-
-    def call_scuttle(self, url: str, capture_filename: str = None):
-        if not validate_url(self.url):
-            raise ValueError("Unsupported URL type", url)
-        full_text = None
-
-        output = check_output([SCUTTLE_BIN, '--capture-file', capture_filename, '--json', shlex.quote(url)]).decode('utf-8')
-        app.logger.info(f"*** scuttle {url=} {output=} {capture_filename=}")
-
-        try:
-            result = json.loads(output)
-        except json.JSONDecodeError:
-            app.logger.error(f"*** [ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE")
-            raise
-
-        if capture_filename:
-            try:
-                with open(capture_filename, 'r') as file:
-                    full_text = file.read()
-            except Exception as e:
-                app.logger.error(f"*** [ERROR] could not read captured file; {e}")
-            finally:
-                if os.path.exists(capture_filename):
-                    os.remove(capture_filename)
-
-        return result, full_text
+                result = json.loads(output)
+            except json.JSONDecodeError:
+                logger.error(f"*** [ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE")
+                raise
+            full_text = self.read_file(capture_filename)
+            return result, full_text
 
     def decode_scuttle_output(self, data: Dict[str, str]):
        # Decode the output from the Scuttle tool
@@ -208,25 +204,30 @@ class SummarizeCard(URLCard):
     def process(self):
        super().process()
        self.summary = check_output([SUMMARIZE_BIN, self.url, self.prompt]).decode('utf-8')
+       # hack: propagate summary to Ask context
+       setattr(self, 'summary', self.summary)
+       session['summary'] = self.summary
        return self.get_template()
 
 class AskCard(BaseCard):
     def __init__(self):
-       super().__init__(template='cards/ask/index.page', params=['question', 'context'])
-       self.question = ''
-       self.context = '' 
-       self.answer = '' 
+        super().__init__(template='cards/ask/index.page', params=['question', 'context'])
+        self.question = ''
+        self.context = '' 
+        self.answer = '' 
  
     def form(self):
-       return super().form() + [
-           { 'name':'question','id':'question-textarea', 'label':'Question:', 'type':'text', 'value': self.question , 'tag': 'textarea'},
-           { 'name':'context', 'id':'context-textarea', 'label':'Context:', 'type':'text', 'value': self.context, 'tag':'textarea' }
-       ]
+        # hack: propagate summary from Summary to Ask context
+        context_value = self.context or session.get('summary', '')
+        return super().form() + [
+            { 'name':'question','id':'question-textarea', 'label':'Question:', 'type':'text', 'value': self.question , 'tag': 'textarea'},
+            { 'name':'context', 'id':'context-textarea', 'label':'Context:', 'type':'text', 'value': context_value, 'tag':'textarea' }
+        ]
  
     def process(self):
-       super().process()
-       self.answer = check_output([ASK_BIN, 'any', self.question], input=self.context.encode('utf-8')).decode('utf-8')
-       return self.get_template()
+        super().process()
+        self.answer = check_output([ASK_BIN, 'any', self.question], input=self.context.encode('utf-8')).decode('utf-8')
+        return self.get_template()
  
  
 class ViaAPIModelCard(BaseCard):
@@ -304,7 +305,12 @@ def route_card(card):
    return card_router(CARDS.get(card, ErrorCard))
 
 if __name__ != '__main__':
-    #gunicorn_logger = logging.getLogger('gunicorn.error')
     gunicorn_logger = logging.getLogger('gunicorn.warn')
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
+    logger = logging.getLogger(__name__)
+    logger.setLevel(gunicorn_logger.level)
+
+
+
+
