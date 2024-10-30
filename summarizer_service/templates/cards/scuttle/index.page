@@ -4,6 +4,18 @@
 {% block content %}
 {% include 'cards/main-form.body' %}
 
+<script>
+    // Submit immediately if the URL field has a value
+    // and if submission has not already occurred
+    document.addEventListener("DOMContentLoaded", function () {
+	const urlField = document.querySelector("input[name=url]"); 
+        if (urlField.value && !sessionStorage.getItem("formSubmitted")) {
+	    document.getElementById("submit-button").click();
+	    sessionStorage.setItem("formSubmitted", "true");
+	}
+    });
+</script>
+
 <div class="tab-container">
   <button type="submit" class="tab-button active" id="submit-button" form="mainform">Scuttle</button>
 </div>
