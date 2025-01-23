@@ -104,19 +104,40 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function selectMarkdownTab() {
-	activateTab(markdownTab, markdownText);
+      activateTab(markdownTab, markdownText);
 
-	MathJax.typesetPromise([rawText]).then(() => {
-	    console.log("MathJax rendering complete.");
-	    let it = rawText.innerText;
-	    let tv = convertMarkdownTable(it);
-            let v = marked.parse(tv);
- 	    let vs = sanitize_dom(v);
-            markdownText.innerHTML = v;
-	}).catch((err) => {
-	    console.error("MathJax rendering error:", err.message);
+      // 1. Get the raw text from the Raw Text div
+      let it = rawText.innerText;
+
+      // 2. Double the backslashes before Marked sees them
+      //    So: \( becomes \\( in the source string => final HTML has \( 
+      //    Then Marked won't strip them out.
+      it = it
+	.replace(/\\\(/g, '\\\\(')
+	.replace(/\\\)/g, '\\\\)')
+	.replace(/\\\[/g, '\\\\[')
+	.replace(/\\\]/g, '\\\\]');
+
+      // 3. Convert tables, if you still need that
+      let tv = convertMarkdownTable(it);
+
+      // 4. Parse the pre-processed text into HTML
+      let v = marked.parse(tv);
+
+      // 5. (Optional) sanitize the HTML if desired
+      let vs = sanitize_dom(v);
+
+      // 6. Now set the HTML in the markdownText element
+      markdownText.innerHTML = vs;
+
+      // 7. Finally call MathJax on the newly injected HTML
+      MathJax.typesetPromise([markdownText])
+	.then(() => {
+	  console.log("Math in markdownText rendered.");
+	})
+	.catch(err => {
+	  console.error("MathJax rendering error:", err);
 	});
-
     }
 
     const tabEvents = {
