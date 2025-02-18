@@ -1,4 +1,2 @@
-#!/bin/bash
-screen -dmS summarizer /home/$USER/wip/summarizer-service/run.sh
-
-
+#!/bin/bash -x
+screen -dmS summarizer /home/$LOGNAME/wip/summarizer-service/run.sh
