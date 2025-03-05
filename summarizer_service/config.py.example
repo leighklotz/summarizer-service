@@ -9,4 +9,3 @@ VIA_BIN="/home/klotz/wip/llamafiles/scripts/via.sh"
 ASK_BIN="/home/klotz/wip/llamafiles/scripts/ask.sh"
 OPENAPI_UI_SERVER="http://localhost:7860"
 LLAMAFILES_LINK="https://github.com/leighklotz/llamafiles"
-
