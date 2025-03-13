@@ -9,4 +9,4 @@ export SECRET_KEY="$(openssl rand -hex 24)"
 
 ${VIA_BIN} --get-via || exit 1
 
-gunicorn --workers=2 --log-level=info --access-logfile - -b ${LISTEN_HOST}:${PORT} --timeout 300 summarizer_service:app --limit-request-line 65535
+gunicorn --workers=2 --log-level=info --access-logfile - -b ${LISTEN_HOST}:${PORT} --timeout 300 summarizer_service:app --limit-request-line 0
