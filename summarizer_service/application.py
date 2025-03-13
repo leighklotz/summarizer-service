@@ -186,8 +186,8 @@ class ScuttleCard(URLCard):
 class SummarizeCard(URLCard):
     prompts = [ "Summarize.",
                 "Summarize as bullet points.",
-                "Answer the title question in one sentence."
-                "Answer the title question in one paragraph."
+                "Answer the title question in one sentence.",
+                "Answer the title question in one paragraph.",
                 "Write help text to add to this web page."]
     def __init__(self):
        super().__init__(template='cards/summarize/index.page', params=['prompt'])
