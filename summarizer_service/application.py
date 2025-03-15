@@ -2,38 +2,6 @@
 # Copyright 2024-2025 Leigh Klotz
 # A web application that provides LLM-based text web page summarization for bookmarking services using Flask, subprocesses, and custom scripts.
 
-# **1. Session Management & Context:**
-# 
-# *   **Potential Race Condition:**  Multiple requests *could* potentially access and modify `session['model_counts']` concurrently, especially under high load.  While Flask-Session with the filesystem backend is convenient, it's not inherently thread-safe.  Consider using a more robust session store (Redis, database) for production environments if concurrency is a concern. The `with self.app.app_context():` blocks help, but don't entirely eliminate the possibility.
-# *   **Session Modification:** The code explicitly sets `session.modified = True` after modifying `session['model_counts']`. This is *crucial* because Flask-Session only saves the session if it detects changes.  Good practice!  But double-check that all modifications to the session trigger this.
-# *   **Session Scope:**  The `session` object is tied to the Flask application context.  Ensure that the `ModelTracker` is correctly initialized *within* an application context to avoid potential issues.  The current code appears to handle this correctly using `with self.app.app_context():`, but review any places where `ModelTracker` might be accessed outside of a request lifecycle.
-# *   **`clear_session()` - Incomplete Clearing:** The `clear_session()` function doesn't clear *all* session keys. It explicitly resets `url`, `question`, and `context`, but other keys added by cards (like `prompt` in `SummarizeCard`) will persist. This could lead to unexpected behavior if a user navigates back after using a card that sets a session variable not explicitly cleared. Consider `session.clear()` for a full reset, *or* explicitly clear all relevant card-specific keys in `clear_session()`.
-# 
-# **2. ModelTracker Logic:**
-# 
-# *   **`get_sorted()` - Potential for Inconsistent Ordering:** The `sorted()` function is stable, but if multiple models have the *same* usage count, their relative order in the `sorted_keys` list isn't guaranteed.  If a consistent order is important (e.g., for display), you might need a secondary sorting key (e.g., model name alphabetically).
-# *   **Model Name Handling:**  Ensure that `model_name` values are consistent.  Case sensitivity could lead to different entries for the same model.  Consider normalizing model names (e.g., converting to lowercase) before storing them in `session['model_counts']`.
-# 
-# **3. Usage within Cards:**
-# 
-# *   **`app.config['MODEL_TRACKER'].note_usage()`:**  This call happens in several cards (`URLCard`, `ScuttleCard`, `SummarizeCard`, `AskCard`).  Verify that it's always called *after* a successful operation.  If an exception occurs before `note_usage()`, the model count won't be updated.
-# *    **`ViaAPIModelCard` and Model Loading:**  The `ViaAPIModelCard`'s `process` method only calls `note_usage` if `self.model_name` is set. This might be unintentional; you might want to track the attempt to *load* a model even if the loading fails.
-# 
-# **4. Testing & Edge Cases:**
-# 
-# *   **Session Expiration:**  Test what happens when the session expires.  Will the `ModelTracker` correctly handle the lack of `session['model_counts']`?
-# *   **Large Numbers of Models:**  Consider the performance implications of tracking a very large number of models in the session.  The `Counter` object and the sorting operation could become slow.
-# *   **Error Handling:**  Add more robust error handling around session access and modification.  While the code has some exception handling, consider adding `try...except` blocks around critical session operations to prevent unexpected crashes.
-# 
-# **Specific Code Snippets to Review/Modify:**
-# 
-# *   **`ModelTracker.__init__`:**  Verify that `app.app_context()` is necessary *within* `__init__`. It's likely safe, but double-check.
-# *   **`clear_session()`:**  Consider `session.clear()` or adding more explicit clearing of card-specific variables.
-# *   **`SummarizeCard.process()` and `AskCard.process()`:** Add `try...except` around the `check_output` call to ensure `note_usage()` is still called even if the summarization/question answering fails.
-# *   **`ViaAPIModelCard.process()`:** Decide if `note_usage()` should be called even if `self.model_name` is empty.
-# 
-# 
-
 import logging
 import os
 import json
@@ -84,20 +52,25 @@ def validate_url(url: str) -> bool:
 class ModelTracker:
     def __init__(self, app):  # Pass the Flask app instance
         self.app = app
-        with self.app.app_context():  # Access session within an app context
-            if 'model_counts' not in session:
-                session['model_counts'] = Counter()
+        # Do NOT initialize session here.  Defer initialization to when it's needed
+        # within a request context.
 
     def note_usage(self, model_name):
         with self.app.app_context(): # Access session within an app context
-            session['model_counts'][model_name] += 1
+            if 'model_counts' not in session:
+                session['model_counts'] = Counter() # Initialize only when needed
+            session['model_counts'][model_name] += 1  
             session.modified = True
 
     def get_model_count(self, model_name):
-        return session['model_counts'][model_name]
+        if 'model_counts' not in session:
+            return 0  # Or any default value if not initialized
+        return session['model_counts'][model_name] # MODEL NAMES ARE CASE SENSITIVE!
 
     def get_sorted(self):
-        sorted_items = sorted(session['model_counts'].items(), key=lambda item: item[1], reverse=True)
+        if 'model_counts' not in session:
+            return []  # Return an empty list if not initialized
+        sorted_items = sorted(session['model_counts'].items(), key=lambda item: (item[1], item[0]), reverse=True) # Sort by count then name
         sorted_keys = [item[0] for item in sorted_items]
         return sorted_keys
 
@@ -115,19 +88,19 @@ class BaseCard:
         return render_template(self.template, card=self, main_header=MAIN_HEADER)
 
     def pre_process(self):
-        for param in request.args:  
+        for param in request.args:
             value = request.args.get(param)
-            setattr(self, param, value) 
+            setattr(self, param, value)
             session[param] = value
 
         for param in request.form:
             value = request.form.get(param)
-            setattr(self, param, value) 
+            setattr(self, param, value)
             session[param] = value
 
         for param in self.params:
             if not getattr(self, param) and param in session:
-                setattr(self, param, session[param]) 
+                setattr(self, param, session[param])
 
     def process(self):
         return self.get_template()
@@ -182,7 +155,7 @@ class URLCard(BaseCard):
 
     def form(self):
         return super().form() + [
-            { 'name':'url', 'label':"Enter URL:", 'type':'url', 'required':'required', 'value': self.url, 'autocomplete':  'off' }, 
+            { 'name':'url', 'label':"Enter URL:", 'type':'url', 'required':'required', 'value': self.url, 'autocomplete':  'off' },
         ]
 
     def process(self):
@@ -192,7 +165,7 @@ class URLCard(BaseCard):
                 raise ValueError("Unsupported URL type", self.url)
         app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
         return None
-                                    
+
 class ScuttleCard(URLCard):
     def __init__(self):
         super().__init__(template='cards/scuttle/index.page')
@@ -235,7 +208,7 @@ class ScuttleCard(URLCard):
        tags = self.list_to_comma_separated(data['keywords'])
        url = f'https://scuttle.klotz.me/bookmarks/klotz?action=add&address={quote_plus(link)}&description={quote_plus(description)}&title={quote_plus(title)}&tags={quote_plus(tags)}'
        return url
- 
+
     def list_to_comma_separated(self, keywords: List[str]):
        # Convert a list of keywords to a comma-separated string
        if isinstance(keywords, list):
@@ -244,7 +217,7 @@ class ScuttleCard(URLCard):
           return keywords
        else:
           raise ValueError("Not a string or list of strings", keywords)
- 
+
 class SummarizeCard(URLCard):
     prompts = [ "Summarize.",
                 "Summarize as bullet points.",
@@ -254,28 +227,32 @@ class SummarizeCard(URLCard):
     def __init__(self):
        super().__init__(template='cards/summarize/index.page', params=['prompt'])
        self.prompt = 'Summarize'
-       self.summary = '' 
- 
+       self.summary = ''
+
     def form(self):
        return super().form() + [
           { 'name':'prompt', id:'prompt-input', 'label':"Prompt:", 'type':"text", 'list':"prompts", 'value': self.prompt }
        ]
- 
+
     def process(self):
-       super().process()
-       self.summary = check_output([SUMMARIZE_BIN, self.url, self.prompt]).decode('utf-8')
-       app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
-       # hack: propagate summary to Ask context
-       session['summary'] = self.summary
-       return self.get_template()
+        try:
+            super().process()
+            self.summary = check_output([SUMMARIZE_BIN, self.url, self.prompt]).decode('utf-8')
+            app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
+            # hack: propagate summary to Ask context
+            session['summary'] = self.summary
+            return self.get_template()
+        except Exception as e:
+            logger.error(f"Error during summarization: {e}")
+            return self.get_template()
 
 class AskCard(BaseCard):
     def __init__(self):
         super().__init__(template='cards/ask/index.page', params=['question', 'context'])
         self.question = ''
-        self.context = '' 
-        self.answer = '' 
- 
+        self.context = ''
+        self.answer = ''
+
     def form(self):
         # hack: propagate summary from Summary to Ask context
         context_value = self.context or session.get('summary', '')
@@ -283,24 +260,27 @@ class AskCard(BaseCard):
             { 'name':'question','id':'question-textarea', 'label':'Question:', 'type':'text', 'value': self.question , 'tag': 'textarea'},
             { 'name':'context', 'id':'context-textarea', 'label':'Context:', 'type':'text', 'value': context_value, 'tag':'textarea' }
         ]
- 
+
     def process(self):
-        super().process()
-        self.answer = check_output([ASK_BIN, 'any', self.question], input=self.context.encode('utf-8')).decode('utf-8')
-        app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
-        return self.get_template()
- 
- 
+        try:
+            super().process()
+            self.answer = check_output([ASK_BIN, 'any', self.question], input=self.context.encode('utf-8')).decode('utf-8')
+            app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
+            return self.get_template()
+        except Exception as e:
+            logger.error(f"Error during question answering: {e}")
+            return self.get_template()
+
 class ViaAPIModelCard(BaseCard):
     LOAD_MODEL_FLAG = '--load-model'
     LIST_MODELS_FLAG = '--list-models'
- 
+
     def __init__(self):
        super().__init__(template='cards/via-api-model/index.page', params=['model_name', 'output'])
        self.model_name = ''
        self.output = ''
        self.models_list = self.get_models_list()
- 
+
     def get_models_list(self):
        # use shell via --api to get the newline separated list of model names into an array of strings
        models_list = check_output([VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LIST_MODELS_FLAG]).decode('utf-8').split('\n')
@@ -309,13 +289,13 @@ class ViaAPIModelCard(BaseCard):
        # todo: start with popular models and then end with models_list - popular_models
        models_list = popular_models + ["----"] + models_list
        return models_list
- 
+
     def process(self):
        super().process()
        if self.model_name:
           self.output = check_output([VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
        return self.get_template()
- 
+
 class HomeCard(BaseCard):
     def __init__(self):
         super().__init__(template='cards/home/index.page')
@@ -342,7 +322,7 @@ def card_router(card_constructor):
           return card.get_template()
     else:
        return card.get_template()
-    
+
 CARDS: Dict[str,BaseCard] = {
     'home': HomeCard,
     'scuttle': ScuttleCard,
@@ -353,7 +333,7 @@ CARDS: Dict[str,BaseCard] = {
 }
 
 def clear_session():
-    session.clear() 
+    session.clear()
     session['url'] = ''
     session['question'] = ''
     session['context'] = ''
