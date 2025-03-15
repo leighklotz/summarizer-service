@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2024 Leigh Klotz
+# Copyright 2024-2025 Leigh Klotz
 # A web application that provides LLM-based text web page summarization for bookmarking services using Flask, subprocesses, and custom scripts.
 
 import logging
@@ -28,13 +28,6 @@ MAIN_HEADER = {
 }
 
 app = None
-
-
-# https://old.reddit.com/r/LocalLLaMA/comments/1ftjbz3/shockingly_good_superintelligent_summarization/
-# /u/Flashy_Management962
-FLASHY_MANAGEMENT="""1.) Analyze the input text and generate 5 essential questions that, when answered, capture the main points and core meaning of the text.
-2.) When formulating your questions: a. Address the central theme or argument b. Identify key supporting ideas c. Highlight important facts or evidence d. Reveal the author's purpose or perspective e. Explore any significant implications or conclusions.
-3.) Answer all of your generated questions one-by-one in detail."""
 
 def create_app():
     global app
@@ -191,9 +184,11 @@ class ScuttleCard(URLCard):
           raise ValueError("Not a string or list of strings", keywords)
  
 class SummarizeCard(URLCard):
-    prompts = [ "Summarize", "Answer the question in the title in one sentence", "Summarize as bullet points",
-                "Summarize the main points", "What is unusual about this?", "Write help text to add to this web page",
-                FLASHY_MANAGEMENT]
+    prompts = [ "Summarize.",
+                "Summarize as bullet points.",
+                "Answer the title question in one sentence.",
+                "Answer the title question in one paragraph.",
+                "Write help text to add to this web page."]
     def __init__(self):
        super().__init__(template='cards/summarize/index.page', params=['prompt'])
        self.prompt = 'Summarize'
@@ -312,7 +307,3 @@ if __name__ != '__main__':
     app.logger.setLevel(gunicorn_logger.level)
     logger = logging.getLogger(__name__)
     logger.setLevel(gunicorn_logger.level)
-
-
-
-

@@ -1,5 +1,8 @@
 *~
 #*#
 __*
-
 flask_session
+.__pycache__
+*.pyc
+*.pyd
+*.pyo
