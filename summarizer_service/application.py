@@ -2,6 +2,38 @@
 # Copyright 2024-2025 Leigh Klotz
 # A web application that provides LLM-based text web page summarization for bookmarking services using Flask, subprocesses, and custom scripts.
 
+# **1. Session Management & Context:**
+# 
+# *   **Potential Race Condition:**  Multiple requests *could* potentially access and modify `session['model_counts']` concurrently, especially under high load.  While Flask-Session with the filesystem backend is convenient, it's not inherently thread-safe.  Consider using a more robust session store (Redis, database) for production environments if concurrency is a concern. The `with self.app.app_context():` blocks help, but don't entirely eliminate the possibility.
+# *   **Session Modification:** The code explicitly sets `session.modified = True` after modifying `session['model_counts']`. This is *crucial* because Flask-Session only saves the session if it detects changes.  Good practice!  But double-check that all modifications to the session trigger this.
+# *   **Session Scope:**  The `session` object is tied to the Flask application context.  Ensure that the `ModelTracker` is correctly initialized *within* an application context to avoid potential issues.  The current code appears to handle this correctly using `with self.app.app_context():`, but review any places where `ModelTracker` might be accessed outside of a request lifecycle.
+# *   **`clear_session()` - Incomplete Clearing:** The `clear_session()` function doesn't clear *all* session keys. It explicitly resets `url`, `question`, and `context`, but other keys added by cards (like `prompt` in `SummarizeCard`) will persist. This could lead to unexpected behavior if a user navigates back after using a card that sets a session variable not explicitly cleared. Consider `session.clear()` for a full reset, *or* explicitly clear all relevant card-specific keys in `clear_session()`.
+# 
+# **2. ModelTracker Logic:**
+# 
+# *   **`get_sorted()` - Potential for Inconsistent Ordering:** The `sorted()` function is stable, but if multiple models have the *same* usage count, their relative order in the `sorted_keys` list isn't guaranteed.  If a consistent order is important (e.g., for display), you might need a secondary sorting key (e.g., model name alphabetically).
+# *   **Model Name Handling:**  Ensure that `model_name` values are consistent.  Case sensitivity could lead to different entries for the same model.  Consider normalizing model names (e.g., converting to lowercase) before storing them in `session['model_counts']`.
+# 
+# **3. Usage within Cards:**
+# 
+# *   **`app.config['MODEL_TRACKER'].note_usage()`:**  This call happens in several cards (`URLCard`, `ScuttleCard`, `SummarizeCard`, `AskCard`).  Verify that it's always called *after* a successful operation.  If an exception occurs before `note_usage()`, the model count won't be updated.
+# *    **`ViaAPIModelCard` and Model Loading:**  The `ViaAPIModelCard`'s `process` method only calls `note_usage` if `self.model_name` is set. This might be unintentional; you might want to track the attempt to *load* a model even if the loading fails.
+# 
+# **4. Testing & Edge Cases:**
+# 
+# *   **Session Expiration:**  Test what happens when the session expires.  Will the `ModelTracker` correctly handle the lack of `session['model_counts']`?
+# *   **Large Numbers of Models:**  Consider the performance implications of tracking a very large number of models in the session.  The `Counter` object and the sorting operation could become slow.
+# *   **Error Handling:**  Add more robust error handling around session access and modification.  While the code has some exception handling, consider adding `try...except` blocks around critical session operations to prevent unexpected crashes.
+# 
+# **Specific Code Snippets to Review/Modify:**
+# 
+# *   **`ModelTracker.__init__`:**  Verify that `app.app_context()` is necessary *within* `__init__`. It's likely safe, but double-check.
+# *   **`clear_session()`:**  Consider `session.clear()` or adding more explicit clearing of card-specific variables.
+# *   **`SummarizeCard.process()` and `AskCard.process()`:** Add `try...except` around the `check_output` call to ensure `note_usage()` is still called even if the summarization/question answering fails.
+# *   **`ViaAPIModelCard.process()`:** Decide if `note_usage()` should be called even if `self.model_name` is empty.
+# 
+# 
+
 import logging
 import os
 import json
@@ -11,6 +43,8 @@ import base64
 from urllib.parse import quote_plus
 from subprocess import check_output, CalledProcessError
 from tempfile import NamedTemporaryFile
+from collections import Counter
+
 import shlex
 
 from flask import Flask, request, redirect, render_template, jsonify, url_for, session
@@ -34,19 +68,38 @@ def create_app():
     if app is None:
         app = Flask(__name__)
 
-        if not app.config.get('SECRET_KEY', None):
-            try:
-                app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
-            except KeyError:
-                raise ValueError("No 'SECRET_KEY' specified in environment variables; sessions will not work.")
+        # More robust SECRET_KEY handling
+        app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_default_secret_key') # Provide a default
+        if app.config['SECRET_KEY'] == 'your_default_secret_key':
+            print("WARNING: Using default SECRET_KEY.  Set SECRET_KEY environment variable for production.")
         app.config['SESSION_TYPE'] = 'filesystem'
+
     Session(app)
+    app.config['MODEL_TRACKER'] = ModelTracker(app)  # Pass the app instance
     return app
 
 def validate_url(url: str) -> bool:
     return url.startswith('http://') or url.startswith('https://')
 
-app = create_app()
+class ModelTracker:
+    def __init__(self, app):  # Pass the Flask app instance
+        self.app = app
+        with self.app.app_context():  # Access session within an app context
+            if 'model_counts' not in session:
+                session['model_counts'] = Counter()
+
+    def note_usage(self, model_name):
+        with self.app.app_context(): # Access session within an app context
+            session['model_counts'][model_name] += 1
+            session.modified = True
+
+    def get_model_count(self, model_name):
+        return session['model_counts'][model_name]
+
+    def get_sorted(self):
+        sorted_items = sorted(session['model_counts'].items(), key=lambda item: item[1], reverse=True)
+        sorted_keys = [item[0] for item in sorted_items]
+        return sorted_keys
 
 class BaseCard:
     VIA_FLAG = '--via'
@@ -82,14 +135,20 @@ class BaseCard:
     def form(self):
         return []
 
+    def get_model_name(self):
+        via = os.environ.get('VIA', DEFAULT_VIA)
+        return self._get_via_script(VIA_BIN, self.VIA_FLAG, via, self.GET_MODEL_NAME_FLAG) or f"{model_type}?";
+        
     def _get_model_info(self):
         via = os.environ.get('VIA', DEFAULT_VIA)
         model_type = os.environ.get('MODEL_TYPE', DEFAULT_MODEL_TYPE)
+        model_name = self.get_model_name()
         return {
             'via': via,
             'model_type': model_type,
-            'model_name': self._get_via_script(VIA_BIN, self.VIA_FLAG, via, self.GET_MODEL_NAME_FLAG) or f"{model_type}?",
-            'model_link': self._determine_model_link(via, model_type)
+            'model_name': model_name,
+            'model_link': self._determine_model_link(via, model_type),
+            'model_count': app.config['MODEL_TRACKER'].get_model_count(model_name)
         }
 
     def _get_via_script(self, script_bin: str, *args):
@@ -127,9 +186,11 @@ class URLCard(BaseCard):
         ]
 
     def process(self):
+        super().process()
         if self.url:
             if not validate_url(self.url):
                 raise ValueError("Unsupported URL type", self.url)
+        app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
         return None
                                     
 class ScuttleCard(URLCard):
@@ -141,6 +202,7 @@ class ScuttleCard(URLCard):
 
         data, full_text = self.call_scuttle(self.url)
         scuttle_url = self.decode_scuttle_output(data)
+        app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
         if full_text:
             session['context'] = full_text
             if scuttle_url:
@@ -160,7 +222,7 @@ class ScuttleCard(URLCard):
             try:
                 result = json.loads(output)
             except json.JSONDecodeError:
-                logger.error(f"*** [ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE")
+                logger.error(f"*** [ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE: %s", output)
                 raise
             full_text = self.read_file(capture_filename)
             return result, full_text
@@ -202,6 +264,7 @@ class SummarizeCard(URLCard):
     def process(self):
        super().process()
        self.summary = check_output([SUMMARIZE_BIN, self.url, self.prompt]).decode('utf-8')
+       app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
        # hack: propagate summary to Ask context
        session['summary'] = self.summary
        return self.get_template()
@@ -224,6 +287,7 @@ class AskCard(BaseCard):
     def process(self):
         super().process()
         self.answer = check_output([ASK_BIN, 'any', self.question], input=self.context.encode('utf-8')).decode('utf-8')
+        app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
         return self.get_template()
  
  
@@ -241,6 +305,9 @@ class ViaAPIModelCard(BaseCard):
        # use shell via --api to get the newline separated list of model names into an array of strings
        models_list = check_output([VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LIST_MODELS_FLAG]).decode('utf-8').split('\n')
        models_list = [ model_name.strip() for model_name in models_list ]
+       popular_models = app.config['MODEL_TRACKER'].get_sorted()
+       # todo: start with popular models and then end with models_list - popular_models
+       models_list = popular_models + ["----"] + models_list
        return models_list
  
     def process(self):
@@ -291,6 +358,9 @@ def clear_session():
     session['question'] = ''
     session['context'] = ''
     session.modified = True
+
+### Flask App
+app = create_app()
 
 ### Routes
 @app.route("/")
