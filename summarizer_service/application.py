@@ -194,8 +194,9 @@ class ScuttleCard(URLCard):
 
             try:
                 result = json.loads(output)
-            except json.JSONDecodeError:
+            except json.decoder.JSONDecodeError:
                 logger.error(f"*** [ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE: %s", output)
+                # import pdb;pdb.set_trace()
                 raise
             full_text = self.read_file(capture_filename)
             return result, full_text
