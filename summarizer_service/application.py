@@ -37,9 +37,10 @@ def create_app():
         app = Flask(__name__)
 
         # More robust SECRET_KEY handling
-        app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_default_secret_key') # Provide a default
-        if app.config['SECRET_KEY'] == 'your_default_secret_key':
-            print("WARNING: Using default SECRET_KEY.  Set SECRET_KEY environment variable for production.")
+        app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "")
+        if not app.config['SECRET_KEY']:
+            log.error("Set SECRET_KEY environment variable for production.")
+            return None
         app.config['SESSION_TYPE'] = 'filesystem'
 
     Session(app)
