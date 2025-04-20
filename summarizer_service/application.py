@@ -39,8 +39,7 @@ def create_app():
         # More robust SECRET_KEY handling
         app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "")
         if not app.config['SECRET_KEY']:
-            log.error("Set SECRET_KEY environment variable for production.")
-            return None
+            raise ValueError("Set SECRET_KEY environment variable for production.")
         app.config['SESSION_TYPE'] = 'filesystem'
 
     Session(app)
