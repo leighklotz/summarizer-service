@@ -5,14 +5,30 @@
 {% include 'cards/main-form.body' %}
 
 <script>
-    // Submit immediately if the URL field has a value
-    // and if submission has not already occurred
     document.addEventListener("DOMContentLoaded", function () {
-	const urlField = document.querySelector("input[name=url]"); 
-        if (urlField.value && !sessionStorage.getItem("formSubmitted")) {
-	    document.getElementById("submit-button").click();
-	    sessionStorage.setItem("formSubmitted", "true");
-	}
+        // Check for '?autosubmit=false' in the URL.  If present, skip auto-submission.
+        const urlParams = new URLSearchParams(window.location.search);
+        const autosubmit = urlParams.get('autosubmit') !== 'false'; // Defaults to true if not present
+
+        if (!autosubmit) {
+            return; // Exit if autosubmit is false
+        }
+
+        const urlField = document.querySelector("input[name=url]");
+        // Check if the urlField exists before accessing its value.  Prevents errors if the element is missing.
+        if (urlField) {
+            const urlValue = urlField.value;
+            //Check if sessionStorage is available and getItem returns a value, 
+            //handling browsers without sessionStorage support.
+            const formSubmitted = sessionStorage.getItem("formSubmitted");
+
+            if (urlValue && !formSubmitted) {
+                document.getElementById("submit-button").click();
+                sessionStorage.setItem("formSubmitted", "true");
+            }
+        } else {
+            console.warn("URL field not found. Auto-submission skipped."); // Log a warning if the URL field is missing.
+        }
     });
 </script>
 
@@ -24,5 +40,3 @@
 {% block helpbody %}
   {% include('cards/scuttle/help.body') %}
 {% endblock %}
-
-

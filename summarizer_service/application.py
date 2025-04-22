@@ -23,7 +23,7 @@ from .config import *
 
 MAIN_HEADER = {
     "/card/home": "Home",
-    "/card/scuttle": "Scuttle",
+    "/card/scuttle?autosubmit=false": "Scuttle",
     "/card/summarize": "Summarize",
     "/card/ask": "Ask",
     "/card/via-api-model": "Via API Models"
