@@ -312,12 +312,8 @@ class StatusCard(BaseCard):
         self.status_output = 'No Status'
 
     def get_template(self):
-        # todo: fixme
-        command = "/home/klotz/wip/summarizer-service/status.sh"
-        logger.debug(f"StatusCard: {command=}")
-
         try:
-            process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            process = subprocess.Popen(STATUS_BIN, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             stdout, stderr = process.communicate()
 
             if process.returncode != 0:
