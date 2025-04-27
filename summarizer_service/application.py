@@ -314,7 +314,7 @@ class StatusCard(BaseCard):
     def get_template(self):
         # todo: fixme
         command = "/home/klotz/wip/summarizer-service/status.sh"
-        logger.warning(f"StatusCard: {command=}")
+        logger.debug(f"StatusCard: {command=}")
 
         try:
             process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -325,8 +325,7 @@ class StatusCard(BaseCard):
                 logger.error(f"Error executing status command (return code {process.returncode}): {stderr}")
             else:
                 self.status_output = stdout.strip()
-                logger.warning(f"StatusCard: {self.status_output=}")
-                logger.debug(f"StatusCard: stdout: {stdout}") # Added debug log for stdout
+                logger.error(f"StatusCard: {self.status_output=}")
                 
         except Exception as e: #Catch broader exceptions, including file not found, etc.
             self.status_output = f"Unexpected error: {e}"
