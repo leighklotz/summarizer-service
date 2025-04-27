@@ -1,18 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Status</title>
-  {% include('header.body') %}
-</head>
-<body>
-  {% include('nav.body') %}
-  {% block content %}
-  <h1>Status</h1>
-  <main>
-      <p>{{ card.status_output }}</p>
-    </main>
-  </main>
-  {% endblock %}
-  {% include('footer.body') %}
-</body>
-</html>
+{% extends "cards/card-base.page" %}
+{% block title %}Status{% endblock %}
+{% block h1 %}Status{% endblock %}
+{% block content %}
+{% include 'cards/main-form.body' %}
+<p />
+
+
+{%if card.status_output %}
+<div id="markdownText" class="form-control display">
+{% for para in card.status_output.split('\n') %}
+{{para}}<br />
+{% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block helpbody %}
+  {% include('cards/status/help.body') %}
+{% endblock %}

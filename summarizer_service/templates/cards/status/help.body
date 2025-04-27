@@ -1,0 +1,7 @@
+<button class="accordion">Guide</button>
+<div class="panel">
+  <h2>Status Guide</h2>
+  <div>
+    <p>Look here for recent errors</p>
+  </div>
+</div>
