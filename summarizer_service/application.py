@@ -7,9 +7,9 @@ import os
 import json
 import yaml
 import base64
+import subprocess 
 
 from urllib.parse import quote_plus
-from subprocess import check_output, CalledProcessError
 from tempfile import NamedTemporaryFile
 from collections import Counter
 
@@ -26,7 +26,8 @@ MAIN_HEADER = {
     "/card/scuttle?autosubmit=false": "Scuttle",
     "/card/summarize": "Summarize",
     "/card/ask": "Ask",
-    "/card/via-api-model": "Via API Models"
+    "/card/via-api-model": "Via API Models",
+    "/card/status": "Status"
 }
 
 app = None
@@ -59,7 +60,7 @@ class ModelTracker:
         with self.app.app_context(): # Access session within an app context
             if 'model_counts' not in session:
                 session['model_counts'] = Counter() # Initialize only when needed
-            session['model_counts'][model_name] += 1  
+            session['model_counts'][model_name] += 1
             session.modified = True
 
     def get_model_count(self, model_name):
@@ -111,7 +112,7 @@ class BaseCard:
     def get_model_name(self):
         via = os.environ.get('VIA', DEFAULT_VIA)
         return self._get_via_script(VIA_BIN, self.VIA_FLAG, via, self.GET_MODEL_NAME_FLAG) or f"{model_type}?";
-        
+
     def _get_model_info(self):
         via = os.environ.get('VIA', DEFAULT_VIA)
         model_type = os.environ.get('MODEL_TYPE', DEFAULT_MODEL_TYPE)
@@ -126,8 +127,8 @@ class BaseCard:
 
     def _get_via_script(self, script_bin: str, *args):
         try:
-            return (check_output([script_bin] + list(args)).decode('utf-8') or '').strip()
-        except CalledProcessError:
+            return (subprocess.check_output([script_bin] + list(args)).decode('utf-8') or '').strip()
+        except subprocess.CalledProcessError:
             return None
 
     def _determine_model_link(self, via: str, model_type: str):
@@ -189,7 +190,7 @@ class ScuttleCard(URLCard):
 
         with NamedTemporaryFile(dir='/tmp', delete=True) as temp:
             capture_filename = temp.name
-            output = check_output([SCUTTLE_BIN, '--capture-file', capture_filename, '--json', shlex.quote(url)]).decode('utf-8')
+            output = subprocess.check_output([SCUTTLE_BIN, '--capture-file', capture_filename, '--json', shlex.quote(url)]).decode('utf-8')
             logger.info(f"*** scuttle {url=} {output=} {capture_filename=}")
 
             try:
@@ -238,7 +239,7 @@ class SummarizeCard(URLCard):
     def process(self):
         try:
             super().process()
-            self.summary = check_output([SUMMARIZE_BIN, self.url, self.prompt]).decode('utf-8')
+            self.summary = subprocess.check_output([SUMMARIZE_BIN, self.url, self.prompt]).decode('utf-8')
             app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
             # hack: propagate summary to Ask context
             session['summary'] = self.summary
@@ -265,7 +266,7 @@ class AskCard(BaseCard):
     def process(self):
         try:
             super().process()
-            self.answer = check_output([ASK_BIN, 'any', self.question], input=self.context.encode('utf-8')).decode('utf-8')
+            self.answer = subprocess.check_output([ASK_BIN, 'any', self.question], input=self.context.encode('utf-8')).decode('utf-8')
             app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
             return self.get_template()
         except Exception as e:
@@ -284,17 +285,16 @@ class ViaAPIModelCard(BaseCard):
 
     def get_models_list(self):
        # use shell via --api to get the newline separated list of model names into an array of strings
-       models_list = check_output([VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LIST_MODELS_FLAG]).decode('utf-8').split('\n')
+       models_list = subprocess.check_output([VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LIST_MODELS_FLAG]).decode('utf-8').split('\n')
        models_list = [ model_name.strip() for model_name in models_list ]
        popular_models = app.config['MODEL_TRACKER'].get_sorted()
-       # todo: start with popular models and then end with models_list - popular_models
        models_list = popular_models + ["----"] + models_list
        return models_list
 
     def process(self):
        super().process()
        if self.model_name:
-          self.output = check_output([VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
+          self.output = subprocess.check_output([VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
        return self.get_template()
 
 class HomeCard(BaseCard):
@@ -305,6 +305,30 @@ class HomeCard(BaseCard):
         # clear session on home card
         clear_session()
         return super().get_template()
+
+class StatusCard(BaseCard):
+    def __init__(self):
+        super().__init__(template='cards/status/index.page')
+        self.status_output = 'No Status'
+
+    def get_template(self):
+        try:
+            process = subprocess.Popen(STATUS_BIN, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            stdout, stderr = process.communicate()
+
+            if process.returncode != 0:
+                self.status_output = f"Error executing command (return code {process.returncode}): {stderr}"
+                logger.error(f"Error executing status command (return code {process.returncode}): {stderr}")
+            else:
+                self.status_output = stdout.strip()
+                logger.error(f"StatusCard: {self.status_output=}")
+                
+        except Exception as e: #Catch broader exceptions, including file not found, etc.
+            self.status_output = f"Unexpected error: {e}"
+            logger.error(f"Unexpected error executing status command: {e}")
+
+        return render_template(self.template, card=self, main_header=MAIN_HEADER, status_output=self.status_output)
+
 
 class ErrorCard(BaseCard):
     def __init__(self):
@@ -330,7 +354,8 @@ CARDS: Dict[str,BaseCard] = {
     'summarize': SummarizeCard,
     'ask': AskCard,
     'via-api-model': ViaAPIModelCard,
-    'error': ErrorCard
+    'error': ErrorCard,
+    'status': StatusCard
 }
 
 def clear_session():
