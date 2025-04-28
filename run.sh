@@ -3,9 +3,15 @@
 SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE}")")"
 cd "${SCRIPT_DIR}"
 
+
 export PATH="${PATH}":"${SCRIPT_DIR}"
 source "${SCRIPT_DIR}/summarizer_service/config.py" 
 export SECRET_KEY="$(openssl rand -hex 24)"
+
+# gemma-3: move these elsewhere
+export USE_SYSTEM_ROLE=1
+export TEMPERATURE=0.15
+export INFERENCE_MODE=instruct
 
 ${VIA_BIN} --get-via || exit 1
 
