@@ -5,14 +5,25 @@
 {% include 'cards/main-form.body' %}
 <p />
 
+<div class="tab-container">
+{%if card.status_output %}
+  <a href="#" class="tab-button active" id="markdownTab">Markdown</a>
+  <a href="#" class="tab-button"        id="plainTextTab">Plain Text</a>
+  <a href="#" class="tab-button"        id="rawTextTab">Raw Text</a>
+{% endif %}
+</div>
 
 {%if card.status_output %}
-<div id="markdownText" class="form-control display">
-{% for para in card.status_output.split('\n') %}
+<div id="markdownText" class="form-control display"></div>
+
+<div id="plainText" class="form-control hide">{% for para in card.status_output.split('\n') %}
 {{para}}<br />
 {% endfor %}
 </div>
+
+<div id="rawText" class="form-control hide">{{ card.status_output }}</div>
 {% endif %}
+
 {% endblock %}
 
 {% block helpbody %}
