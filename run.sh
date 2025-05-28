@@ -15,4 +15,4 @@ export INFERENCE_MODE=instruct
 
 ${VIA_BIN} --get-via || exit 1
 
-gunicorn --workers=2 --log-level=info --access-logfile - -b ${LISTEN_HOST}:${PORT} --timeout 300 summarizer_service:app --limit-request-line 0
+gunicorn --workers=2 --log-level=info --access-logfile - -b ${LISTEN_HOST}:${PORT} --timeout 900 summarizer_service:app --limit-request-line 0
