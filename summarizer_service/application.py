@@ -160,12 +160,19 @@ class URLCard(BaseCard):
         ]
 
     def process(self):
+        self.set_user_agent()
         super().process()
         if self.url:
             if not validate_url(self.url):
                 raise ValueError("Unsupported URL type", self.url)
         app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
         return None
+
+    def set_user_agent(self):
+        user_agent = request.headers.get('User-Agent', None)
+        if user_agent:
+            logger.info(f"Setting USER_AGENT to {user_agent}")
+            os.environ["USER_AGENT"] = user_agent
 
 class ScuttleCard(URLCard):
     def __init__(self):
@@ -193,10 +200,12 @@ class ScuttleCard(URLCard):
             output = subprocess.check_output([SCUTTLE_BIN, '--capture-file', capture_filename, '--json', shlex.quote(url)]).decode('utf-8')
             logger.info(f"*** scuttle {url=} {output=} {capture_filename=}")
 
+            if not output:
+                logger.error(f"*** [ERROR] Empty Ouytput: try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE: output=%s", output)
             try:
                 result = json.loads(output)
             except json.decoder.JSONDecodeError:
-                logger.error(f"*** [ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE: %s", output)
+                logger.error(f"*** [ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE: output=%s", output)
                 # import pdb;pdb.set_trace()
                 raise
             full_text = self.read_file(capture_filename)
