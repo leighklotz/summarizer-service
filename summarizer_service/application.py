@@ -21,6 +21,10 @@ from flask_session import Session
 from typing import List, Dict, Any
 from .config import *
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+
 MAIN_HEADER = {
     "/card/home": "Home",
     "/card/scuttle?autosubmit=false": "Scuttle",
@@ -146,7 +150,7 @@ class BaseCard:
             with open(fn, 'r') as file:
                 return file.read()
         except Exception as e:
-            logger.error(f"*** [ERROR] could not read file {fn=}; {e}")
+            logger.error(f"[ERROR] could not read file {fn=}; {e}")
             raise
 
 class URLCard(BaseCard):
@@ -171,7 +175,7 @@ class URLCard(BaseCard):
     def set_user_agent(self):
         user_agent = request.headers.get('User-Agent', None)
         if user_agent:
-            logger.info(f"Setting USER_AGENT to {user_agent}")
+            logger.debug(f"Setting USER_AGENT to {user_agent}")
             os.environ["USER_AGENT"] = user_agent
 
 class ScuttleCard(URLCard):
@@ -197,15 +201,19 @@ class ScuttleCard(URLCard):
 
         with NamedTemporaryFile(dir='/tmp', delete=True) as temp:
             capture_filename = temp.name
+
+            print(' '.join([SCUTTLE_BIN, '--capture-file', capture_filename, '--json', shlex.quote(url)]))
+            logger.info(f"scuttle {url=} {capture_filename=}")
             output = subprocess.check_output([SCUTTLE_BIN, '--capture-file', capture_filename, '--json', shlex.quote(url)]).decode('utf-8')
-            logger.info(f"*** scuttle {url=} {output=} {capture_filename=}")
+            logger.info(f"scuttle {url=} {capture_filename=} {output=}")
 
             if not output:
-                logger.error(f"*** [ERROR] Empty Ouytput: try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE: output=%s", output)
+                logger.error(f"[ERROR] Empty Output: try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE: output=%s", output)
             try:
                 result = json.loads(output)
             except json.decoder.JSONDecodeError:
-                logger.error(f"*** [ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE: output=%s", output)
+                full_text = self.read_file(capture_filename)
+                logger.error(f"[ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE: output='%s' full_text='%s'", output, full_text)
                 # import pdb;pdb.set_trace()
                 raise
             full_text = self.read_file(capture_filename)
@@ -390,5 +398,3 @@ if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.warn')
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
-    logger = logging.getLogger(__name__)
-    logger.setLevel(gunicorn_logger.level)
