@@ -1,10 +1,8 @@
 #!/bin/bash
 
 SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE}")")"
-cd "${SCRIPT_DIR}"
+. .venv/bin/activate
 
-
-export PATH="${PATH}":"${SCRIPT_DIR}"
 source "${SCRIPT_DIR}/summarizer_service/config.py" 
 export SECRET_KEY="$(openssl rand -hex 24)"
 
