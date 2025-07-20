@@ -17,6 +17,11 @@
 {%if card.answer %}
 <div id="markdownText" class="form-control display"></div>
 
+<select id="divider" class="form-control hide">
+<option value=""></option>
+<option value="---">---</option>
+</select>
+
 <div id="plainText" class="form-control hide">{% for para in card.answer.split('\n') %}
 {{para}}<br />
 {% endfor %}

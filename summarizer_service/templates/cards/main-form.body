@@ -1,14 +1,41 @@
 <form id="mainform" method="POST">
   <div id="grid">
     {% for field in card.form() %}
-    {% set tag = field.get('tag', 'input')  %}
-    {% set v = field.get('value', '')  %}
-    <label for="{{ field['name']|escape }}-{{ tag|escape }}">{{ field['label']|escape }}</label>
-    {% if tag == 'input' %}<{{tag}} {% for key, value in field.items() %}{% if key != 'tag' %}{{key|escape}}="{{value|escape}}"{% endif %} {% endfor %}></{{tag}}>
-    {% elif tag == 'textarea' %}<div id="{{field['name']|escape}}-{{tag}}-div" class="clear-div"><{{tag}} {% for key, value in field.items() %}{% if key not in ['tag', 'value'] %}{{key|escape}}="{{value|escape}}" {% endif %}{% endfor %}>{{v}}</{{tag}}><button class="clear-button" type="button" onclick="toggleTextareaContent(this)">[X]</button></div>{% endif %}
+      {% set tag = field.get('tag', 'input') %}
+      {% set value = field.get('value', '') %}
 
-{% endfor %}
+      <label for="{{ field['name']|escape }}-{{ tag|escape }}">{{ field['label']|escape }}</label>
+
+      {% if tag == 'input' %}
+        <input 
+          {% for key, val in field.items() if key != 'tag' %}
+            {{ key|escape }}="{{ val|escape }}"
+          {% endfor %}
+        >
+      {% elif tag == 'textarea' %}
+        <div id="{{field['name']|escape}}-{{tag}}-div" class="clear-div">
+          <textarea 
+            {% for key, val in field.items() if key not in ['tag', 'value'] %}
+              {{ key|escape }}="{{ val|escape }}"
+            {% endfor %}
+          >{{ value }}</textarea>
+          <button class="clear-button" type="button" onclick="toggleTextareaContent(this)">[X]</button>
+        </div>
+      {% elif tag == 'select' %}
+        <select name="{{ field['name']|escape }}"
+          {% for key, val in field.items() if key not in ['tag', 'options', 'value'] %}
+            {{ key|escape }}="{{ val|escape }}"
+          {% endfor %}
+        >
+          {% for option in field.get('options', []) %}
+            <option value="{{ option|escape }}" {% if option == value %}selected{% endif %}>{{ option|escape }}</option>
+          {% endfor %}
+        </select>
+      {% else %}
+        <!-- Handle other tags or provide a default -->
+        <p>Unsupported field type: {{ tag|escape }}</p> 
+      {% endif %}
+    {% endfor %}
   </div>
   <div id="loading"></div>
 </form>
-

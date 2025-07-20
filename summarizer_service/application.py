@@ -269,6 +269,7 @@ class AskCard(BaseCard):
     def __init__(self):
         super().__init__(template='cards/ask/index.page', params=['question', 'context'])
         self.question = ''
+        self.divider = ''
         self.context = ''
         self.answer = ''
 
@@ -277,17 +278,21 @@ class AskCard(BaseCard):
         context_value = self.context or session.get('summary', '')
         return super().form() + [
             { 'name':'question','id':'question-textarea', 'label':'Question:', 'type':'text', 'value': self.question , 'tag': 'textarea'},
+            { 'name':'divider','id':'divider-select', 'label':'Divider:', 'type':'select', 'value': self.divider , 'tag': 'select', 'options': [ '', '---', '# Context', '# Previous Results' ] },
             { 'name':'context', 'id':'context-textarea', 'label':'Context:', 'type':'text', 'value': context_value, 'tag':'textarea' }
         ]
 
     def process(self):
         try:
             super().process()
-            self.answer = subprocess.check_output([ASK_BIN, 'any', self.question], input=self.context.encode('utf-8')).decode('utf-8')
+            my_input = (self.divider + '\n' + self.context)
+            logger.info(f"self.divider={self.divider} {my_input=}")
+            self.answer = subprocess.check_output([ASK_BIN, 'any', self.question], input=my_input.encode('utf-8')).decode('utf-8')
             app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
             return self.get_template()
         except Exception as e:
             logger.error(f"Error during question answering: {e}")
+            import pdb;pdb.set_trace()
             return self.get_template()
 
 class ViaAPIModelCard(BaseCard):
