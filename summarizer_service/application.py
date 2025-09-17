@@ -80,8 +80,6 @@ class ModelTracker:
         return sorted_keys
 
 class BaseCard:
-    VIA_FLAG = '--via'
-    API_FLAG = 'api'
     GET_MODEL_NAME_FLAG = '--get-model-name'
 
     def __init__(self, template: str, params: List[str]=[]):
@@ -306,8 +304,8 @@ class ViaAPIModelCard(BaseCard):
        self.models_list = self.get_models_list()
 
     def get_models_list(self):
-       # use shell via --api to get the newline separated list of model names into an array of strings
-       models_list = subprocess.check_output([VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LIST_MODELS_FLAG]).decode('utf-8').split('\n')
+       # use shell via to get the newline separated list of model names into an array of strings
+       models_list = subprocess.check_output([VIA_BIN, self.LIST_MODELS_FLAG]).decode('utf-8').split('\n')
        models_list = [ model_name.strip() for model_name in models_list ]
        popular_models = app.config['MODEL_TRACKER'].get_sorted()
        models_list = popular_models + ["----"] + models_list
