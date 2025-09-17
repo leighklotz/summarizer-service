@@ -12,6 +12,6 @@ export USE_SYSTEM_ROLE=1
 export TEMPERATURE=0.15
 export INFERENCE_MODE=instruct
 
-${VIA_BIN} --get-via || exit 1
+${VIA_BIN} --get-model-name || exit 1
 
 gunicorn --workers=2 --log-level=info --access-logfile - -b ${LISTEN_HOST}:${PORT} --timeout 900 summarizer_service:app --limit-request-line 0
