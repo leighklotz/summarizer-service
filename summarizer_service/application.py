@@ -112,18 +112,15 @@ class BaseCard:
         return []
 
     def get_model_name(self):
-        via = os.environ.get('VIA', DEFAULT_VIA)
-        return self._get_via_script(VIA_BIN, self.VIA_FLAG, via, self.GET_MODEL_NAME_FLAG) or f"{model_type}?";
+        return self._get_via_script(VIA_BIN, self.GET_MODEL_NAME_FLAG) or f"{model_type}?";
 
     def _get_model_info(self):
-        via = os.environ.get('VIA', DEFAULT_VIA)
         model_type = os.environ.get('MODEL_TYPE', DEFAULT_MODEL_TYPE)
         model_name = self.get_model_name()
         return {
-            'via': via,
             'model_type': model_type,
             'model_name': model_name,
-            'model_link': self._determine_model_link(via, model_type),
+            'model_link': OPENAPI_UI_SERVER,
             'model_count': app.config['MODEL_TRACKER'].get_model_count(model_name)
         }
 
@@ -132,9 +129,6 @@ class BaseCard:
             return (subprocess.check_output([script_bin] + list(args)).decode('utf-8') or '').strip()
         except subprocess.CalledProcessError:
             return None
-
-    def _determine_model_link(self, via: str, model_type: str):
-        return OPENAPI_UI_SERVER if via == 'api' else LLAMAFILES_LINK
 
     def get_stats(self):
         nvfree = self._get_via_script(NVFREE_BIN) or '0'
@@ -314,7 +308,7 @@ class ViaAPIModelCard(BaseCard):
     def process(self):
        super().process()
        if self.model_name:
-          self.output = subprocess.check_output([VIA_BIN, self.VIA_FLAG, self.API_FLAG, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
+          self.output = subprocess.check_output([VIA_BIN, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
        return self.get_template()
 
 class HomeCard(BaseCard):
