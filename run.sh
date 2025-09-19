@@ -5,13 +5,25 @@ SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE}")")"
 
 cd "${SCRIPT_DIR}" || exit 1
 source "${SCRIPT_DIR}/summarizer_service/config.py" 
-export SECRET_KEY="$(openssl rand -hex 24)"
+export SECRET_KEY
+SECRET_KEY="$(openssl rand -hex 24)"
 
-# gemma-3: move these elsewhere
-export USE_SYSTEM_ROLE=1
-export TEMPERATURE=0.15
-export INFERENCE_MODE=instruct
+model_name="$(${VIA_BIN} --get-model-name)"
+case "$model_name" in
+    *gemma-3*)
+        export USE_SYSTEM_ROLE=1
+        export TEMPERATURE=0.15
+        export INFERENCE_MODE=instruct
+        ;;
+    *Magistral*)
+        unset USE_SYSTEM_ROLE
+        export TEMPERATURE=0.70
+        export TOP_P=0.95
+        export INFERENCE_MODE=instruct
+        ;;
+    *)
+        echo "* Unknown model $model_name"
+        exit 1
+esac
 
-${VIA_BIN} --get-model-name || exit 1
-
-gunicorn --workers=2 --log-level=info --access-logfile - -b ${LISTEN_HOST}:${PORT} --timeout 900 summarizer_service:app --limit-request-line 0
+gunicorn --workers=2 --log-level=info --access-logfile - -b "${LISTEN_HOST}":"${PORT}" --timeout 900 summarizer_service:app --limit-request-line 0
