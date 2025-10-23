@@ -3,3 +3,4 @@ flask_session
 PyYAML
 gunicorn
 yq
+markdownify

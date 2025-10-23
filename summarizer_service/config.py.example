@@ -11,3 +11,4 @@ HELP_BIN="/home/klotz/wip/llamafiles/scripts/help.sh"
 OPENAPI_UI_SERVER="http://localhost:7860"
 LLAMAFILES_LINK="https://github.com/leighklotz/llamafiles"
 STATUS_BIN='/home/klotz/wip/summarizer-service/status.sh'
+SCUTTLE_MODE='--yaml'
