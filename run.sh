@@ -21,6 +21,13 @@ case "$model_name" in
         export TOP_P=0.95
         export INFERENCE_MODE=instruct
         ;;
+    gpt-oss*)
+        unset USE_SYSTEM_ROLE
+        export temperature=1.0
+        export top_p=1.0
+        export top_k=0
+        export INFERENCE_MODE=instruct
+        ;;
     *)
         echo "* Unknown model $model_name"
         exit 1
