@@ -25,7 +25,7 @@ git clone https://github.com/leighklotz/summarizer-service.git
 cd summarizer-service
 
 ```
-Install dependencies:
+Install dependencies and create Python virtualenv:
 ```bash
 pip install -r requirements.txt
 ```
