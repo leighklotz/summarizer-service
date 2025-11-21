@@ -4,7 +4,7 @@ A web application that provides LLM-based text web page summarization for bookma
 Summarizer Service is a bare-bones sample Flask web application using Flask, using subprocesses and custom scripts.
 The application provides text web page summarization for bookmarking services, accepting both GET and POST requests with or without a custom prompt.
 
-Copyright 2024 Leigh Klotz
+Copyright 2024-2025 Leigh Klotz
 
 ## Example
 
@@ -19,51 +19,14 @@ cp config.py.example config.py
 emacs config.py
 ```
 
-Clone this repository:
-```bash
-git clone https://github.com/leighklotz/summarizer-service.git
-cd summarizer-service
-
-```
-Install dependencies and create Python virtualenv:
-```bash
-pip install -r requirements.txt
-```
-
-### Usage
-Here are the options:
-
-1. Run with gunicorn
-```bash
-$ apt install gunicorn
-$ ./run.sh
-```
-
-2. Run the application with Python
+Clone this repository, Install dependencies and create Python virtualenv, and install systemd service:
 
 ```bash
-python app.py
-
-```
-
-3. Run with flask CLI
-
-```bash
-flask run --host 127.0.0.1 --port 8080
-```
-
-The application will be accessible at `http://localhost:8080`.
-
-4. Run with gunicorn, for example as a service.
-
-```bash
-gunicorn -b 0.0.0.0:8080 summarizer_service:app
-```
-
-5. Run with gunicorn and systemd:
-```bash
-cd systemd
-./install.sh
+$ git clone https://github.com/leighklotz/summarizer-service.git
+$ cd summarizer-service
+$ ./install.sh
+$ cd systemd
+$ ./install.sh
 ```
 
 ### Cards
