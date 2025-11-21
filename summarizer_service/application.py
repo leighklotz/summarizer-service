@@ -337,6 +337,11 @@ class StatusCard(BaseCard):
         self.status_output = 'No Status'
 
     def get_template(self):
+        self.status_output = self.get_status()
+        return render_template(self.template, card=self, main_header=MAIN_HEADER, status_output=self.status_output)
+
+    def get_status(self):
+        status_output = "Unavailable"
         try:
             process = subprocess.Popen(STATUS_BIN, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             stdout, stderr = process.communicate()
@@ -345,14 +350,14 @@ class StatusCard(BaseCard):
                 self.status_output = f"Error executing command (return code {process.returncode}): {stderr}"
                 logger.error(f"Error executing status command (return code {process.returncode}): {stderr}")
             else:
-                self.status_output = stdout.strip()
-                logger.error(f"StatusCard: {self.status_output=}")
+                status_output = stdout.strip()
+                logger.info(f"StatusCard: {status_output=}")
                 
-        except Exception as e: #Catch broader exceptions, including file not found, etc.
-            self.status_output = f"Unexpected error: {e}"
+        except Exception as e:
+            status_output = f"Unexpected error: {e}"
             logger.error(f"Unexpected error executing status command: {e}")
 
-        return render_template(self.template, card=self, main_header=MAIN_HEADER, status_output=self.status_output)
+        return status_output
 
 
 class ErrorCard(BaseCard):

@@ -35,16 +35,16 @@ This script will:
 Verify that the service is running:
 
 ```bash
-systemctl --user status summarizer-service.service
+systemctl -l --user status summarizer-service.service
 ```
 
 View logs:
 
 ```bash
-journalctl --user -u summarizer-service.service -e
+journalctl -l --user -u summarizer-service.service -e
 ```
 
-## Managing the Service
+## Managing the Service: start, stop, and restart
 
 ```bash
 systemctl --user start summarizer-service.service
