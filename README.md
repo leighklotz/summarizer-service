@@ -31,7 +31,7 @@ pip install -r requirements.txt
 ```
 
 ### Usage
-Here are three options
+Here are the options:
 
 1. Run with gunicorn
 ```bash
@@ -46,7 +46,7 @@ python app.py
 
 ```
 
-2. Run with flask CLI
+3. Run with flask CLI
 
 ```bash
 flask run --host 127.0.0.1 --port 8080
@@ -54,10 +54,16 @@ flask run --host 127.0.0.1 --port 8080
 
 The application will be accessible at `http://localhost:8080`.
 
-3. Run with gunicorn, for example as a service.
+4. Run with gunicorn, for example as a service.
 
 ```bash
 gunicorn -b 0.0.0.0:8080 summarizer_service:app
+```
+
+5. Run with gunicorn and systemd:
+```bash
+cd systemd
+./install.sh
 ```
 
 ### Cards

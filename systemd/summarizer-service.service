@@ -1,0 +1,29 @@
+[Unit]
+Description=Summarizer Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+
+# Your repo root
+WorkingDirectory=/home/klotz/wip/summarizer-service
+
+ExecStart=/home/klotz/wip/summarizer-service/run.sh
+
+# Restart if gunicorn dies
+Restart=on-failure
+RestartSec=5
+
+# Make sure PATH is sane for openssl, python, etc.
+Environment=PATH=/home/klotz/wip/summarizer-service/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# If you want to force host/port instead of relying on config.py, uncomment:
+# Environment=LISTEN_HOST=127.0.0.1
+# Environment=PORT=8080
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
