@@ -28,7 +28,7 @@ echo
 echo "Installation complete."
 echo
 echo "Check service status:"
-echo "  systemctl --user status summarizer-service.service"
+echo "  systemctl --user status summarizer-service.service -l"
 echo
 echo "Check logs:"
 echo "  journalctl --user -u summarizer-service.service -e"
