@@ -112,13 +112,11 @@ class BaseCard:
         return []
 
     def get_model_name(self):
-        return self._get_via_script(VIA_BIN, self.GET_MODEL_NAME_FLAG) or f"{model_type}?";
+        return self._get_via_script(VIA_BIN, self.GET_MODEL_NAME_FLAG)
 
     def _get_model_info(self):
-        model_type = os.environ.get('MODEL_TYPE', DEFAULT_MODEL_TYPE)
         model_name = self.get_model_name()
         return {
-            'model_type': model_type,
             'model_name': model_name,
             'model_link': OPENAPI_UI_SERVER,
             'model_count': app.config['MODEL_TRACKER'].get_model_count(model_name)
