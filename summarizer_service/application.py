@@ -192,32 +192,21 @@ class ScuttleCard(URLCard):
         with NamedTemporaryFile(dir='/tmp', delete=True) as temp:
             capture_filename = temp.name
 
-            scuttle_call = [SCUTTLE_BIN, '--capture-file', capture_filename, SCUTTLE_MODE, shlex.quote(url)]
+            scuttle_call = [SCUTTLE_BIN, '--capture-file', capture_filename, shlex.quote(url)]
             logger.info(f"scuttle {url=} {capture_filename=} {scuttle_call=}")
             output = subprocess.check_output(scuttle_call).decode('utf-8')
             logger.info(f"scuttle {url=} {capture_filename=} {output=}")
 
             if not output:
                 logger.error(f"[ERROR] Empty Output: try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE: output=%s", output)
-            if SCUTTLE_MODE == '--json':
                 try:
-                    result = json.loads(output)
-                except json.decoder.JSONDecodeError:
+                    result = yaml.safe_load(output)  # Use safe_load for security
+                except yaml.YAMLError as e:
                     full_text = self.read_file(capture_filename)
                     logger.error(f"[ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE: output='%s' full_text='%s'", output, full_text)
+                    # import pdb; pdb.set_trace()
                     raise
-            elif SCUTTLE_MODE == '--yaml':
-                    try:
-                        result = yaml.safe_load(output)  # Use safe_load for security
-                    except yaml.YAMLError as e:
-                        full_text = self.read_file(capture_filename)
-                        logger.error(f"[ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE: output='%s' full_text='%s'", output, full_text)
-                        # import pdb; pdb.set_trace()
-                        raise
-            else:
-                raise "{SCUTTLE_MODE=} unknown"
-            
-
+                
             full_text = self.read_file(capture_filename)
             return result, full_text
 
