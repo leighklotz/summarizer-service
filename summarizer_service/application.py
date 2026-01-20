@@ -176,7 +176,7 @@ class ScuttleCard(URLCard):
         super().process()
 
         data, full_text = self.call_scuttle(self.url)
-        scuttle_url = self.decode_scuttle_output(data)
+        scuttle_url = self.decode_scuttle_yaml_output(data)
         app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
         if full_text:
             session['context'] = full_text
@@ -191,26 +191,23 @@ class ScuttleCard(URLCard):
 
         with NamedTemporaryFile(dir='/tmp', delete=True) as temp:
             capture_filename = temp.name
-
-            scuttle_call = [SCUTTLE_BIN, '--capture-file', capture_filename, shlex.quote(url)]
+            scuttle_call = [SCUTTLE_BIN, '--capture-file', capture_filename, '--yaml', shlex.quote(url)]
             logger.info(f"scuttle {url=} {capture_filename=} {scuttle_call=}")
             output = subprocess.check_output(scuttle_call).decode('utf-8')
-            logger.info(f"scuttle {url=} {capture_filename=} {output=}")
+            # logger.trace(f"scuttle {url=} {capture_filename=} {output=}")
 
-            if not output:
-                logger.error(f"[ERROR] Empty Output: try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE: output=%s", output)
-                try:
-                    result = yaml.safe_load(output)  # Use safe_load for security
-                except yaml.YAMLError as e:
-                    full_text = self.read_file(capture_filename)
-                    logger.error(f"[ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE: output='%s' full_text='%s'", output, full_text)
-                    #import pdb; pdb.set_trace()
-                    raise
-                
+            try:
+                result = yaml.safe_load(output)  # Use safe_load for security
+            except yaml.YAMLError as e:
+                full_text = self.read_file(capture_filename)
+                logger.error(f"[ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE: output='%s' full_text='%s'", output, full_text)
+                # import pdb; pdb.set_trace()
+                raise
+            
             full_text = self.read_file(capture_filename)
             return result, full_text
 
-    def decode_scuttle_output(self, data: Dict[str, str]):
+    def decode_scuttle_yaml_output(self, data: Dict[str, str]):
        # Decode the output from the Scuttle tool
        link = data['link']
        title = data['title']
@@ -283,7 +280,7 @@ class AskCard(BaseCard):
             return self.get_template()
         except Exception as e:
             logger.error(f"Error during question answering: {e}")
-            import pdb;pdb.set_trace()
+            # import pdb;pdb.set_trace()
             return self.get_template()
 
 class ViaAPIModelCard(BaseCard):
