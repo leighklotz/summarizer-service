@@ -204,7 +204,7 @@ class ScuttleCard(URLCard):
                 except yaml.YAMLError as e:
                     full_text = self.read_file(capture_filename)
                     logger.error(f"[ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE: output='%s' full_text='%s'", output, full_text)
-                    # import pdb; pdb.set_trace()
+                    #import pdb; pdb.set_trace()
                     raise
                 
             full_text = self.read_file(capture_filename)
