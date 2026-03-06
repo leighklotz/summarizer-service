@@ -1,12 +1,15 @@
 #!/bin/bash -e
 
 SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE}")")"
+echo $SCRIPT_DIR
 . "${SCRIPT_DIR}/.venv/bin/activate"
 
 # Absolute path to the project root
-PROJECT_ROOT="$(cd "$(dirname "${SCRIPT_DIR}")/.." && pwd)"
+PROJECT_ROOT="$(cd "$(dirname "${SCRIPT_DIR}")" && pwd)"
 
 cd "${SCRIPT_DIR}" || exit 1
+echo $PROJECT_ROOT
+exit 3
 source "${PROJECT_ROOT}/summarizer_service/config.py"
 export SECRET_KEY
 SECRET_KEY="$(openssl rand -hex 24)"
