@@ -11,9 +11,19 @@ SECRET_KEY="$(openssl rand -hex 24)"
 model_name="$(${VIA_BIN} --get-model-name)"
 case "$model_name" in
     *gemma-3*)
-        export USE_SYSTEM_ROLE=1
-        export TEMPERATURE=0.15
+        export ADD_BOS=""       # do not use unset for ADD_BOS                  
         export INFERENCE_MODE=instruct
+        export KEEP_PROMPT_TEMP_FILE=ERRORS
+        export MIN_P=0.05
+        export REPEAT_PENALTY=1.0
+        export SEED=123
+        export TEMPERATURE=0.8
+        export TOP_K=40
+        export TOP_P=0.95
+        export VIA=api
+        unset INHIBIT_GRAMMAR
+        unset USE_SYSTEM_ROLE
+        unset VIA_API_INHIBIT_GRAMMAR
         ;;
     *Magistral*)
         unset USE_SYSTEM_ROLE
