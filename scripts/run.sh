@@ -1,15 +1,13 @@
 #!/bin/bash -e
 
 SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE}")")"
-echo $SCRIPT_DIR
 . "${SCRIPT_DIR}/.venv/bin/activate"
+cd "${SCRIPT_DIR}" || exit 1
 
 # Absolute path to the project root
 PROJECT_ROOT="$(cd "$(dirname "${SCRIPT_DIR}")" && pwd)"
+export PYTHONPATH="${PROJECT_ROOT}"
 
-cd "${SCRIPT_DIR}" || exit 1
-echo $PROJECT_ROOT
-exit 3
 source "${PROJECT_ROOT}/summarizer_service/config.py"
 export SECRET_KEY
 SECRET_KEY="$(openssl rand -hex 24)"
@@ -49,4 +47,4 @@ case "$model_name" in
         exit 1
 esac
 
-gunicorn --workers=2 --log-level=info --access-logfile - -b "${LISTEN_HOST}":"${PORT}" --timeout 900 "${PROJECT_ROOT}/summarizer_service:app" --limit-request-line 0
+gunicorn --workers=2 --log-level=info --access-logfile - -b "${LISTEN_HOST}":"${PORT}" --timeout 900 "summarizer_service:app" --limit-request-line 0
