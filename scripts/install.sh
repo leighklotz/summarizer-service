@@ -37,7 +37,7 @@ pip install --upgrade pip || { echo "Error: Failed to upgrade pip." >&2; exit 1;
 
 # Install requirements
 echo "Installing requirements..."
-pip install -r summarizer_service/requirements.txt || { echo "Error: Failed to install requirements." >&2; exit 1; }
+pip install -r ../summarizer_service/requirements.txt || { echo "Error: Failed to install requirements." >&2; exit 1; }
 
 echo "Setup complete."
 echo "To deactivate the environment, run: deactivate"
