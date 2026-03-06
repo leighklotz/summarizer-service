@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE}")")"
 . "${SCRIPT_DIR}/.venv/bin/activate"
@@ -10,7 +10,7 @@ SECRET_KEY="$(openssl rand -hex 24)"
 
 model_name="$(${VIA_BIN} --get-model-name)"
 case "$model_name" in
-    *gemma-3*)
+    *gemma*3*)
         export ADD_BOS=""       # do not use unset for ADD_BOS                  
         export INFERENCE_MODE=instruct
         export KEEP_PROMPT_TEMP_FILE=ERRORS

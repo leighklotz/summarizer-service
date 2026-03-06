@@ -23,9 +23,9 @@ Clone this repository, Install dependencies and create Python virtualenv, and in
 
 ```bash
 $ git clone https://github.com/leighklotz/summarizer-service.git
-$ cd summarizer-service
+$ cd summarizer-service/scripts
 $ ./install.sh
-$ cd systemd
+$ cd ../systemd
 $ ./install.sh
 ```
 

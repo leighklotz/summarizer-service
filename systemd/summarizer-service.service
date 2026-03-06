@@ -9,7 +9,7 @@ Type=simple
 # Your repo root
 WorkingDirectory=/home/klotz/wip/summarizer-service
 
-ExecStart=/home/klotz/wip/summarizer-service/run.sh
+ExecStart=/home/klotz/wip/summarizer-service/scripts/run.sh
 
 # Restart if gunicorn dies
 Restart=on-failure
