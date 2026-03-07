@@ -176,7 +176,7 @@ class ScuttleCard(URLCard):
         super().process()
 
         data, full_text = self.call_scuttle(self.url)
-        scuttle_url = self.decode_scuttle_yaml_output(data)
+        scuttle_url = self.decode_scuttle_yaml_output(self.url, data)
         app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
         if full_text:
             session['context'] = full_text
@@ -200,21 +200,27 @@ class ScuttleCard(URLCard):
                 result = yaml.safe_load(output)  # Use safe_load for security
             except yaml.YAMLError as e:
                 full_text = self.read_file(capture_filename)
-                logger.error(f"[ERROR] cannot parse output; try VIA_API_INHIBIT_GRAMMAR or USE_SYSTEM_ROLE: output='%s' full_text='%s'", output, full_text)
+                logger.error(f"[ERROR] cannot parse output: output='%s' full_text='%s'", output, full_text)
                 # import pdb; pdb.set_trace()
                 raise
             
             full_text = self.read_file(capture_filename)
             return result, full_text
 
-    def decode_scuttle_yaml_output(self, data: Dict[str, str]):
-       # Decode the output from the Scuttle tool
-       link = data['link']
-       title = data['title']
-       description = data['description']
-       tags = self.list_to_comma_separated(data['keywords'])
-       url = f'https://scuttle.klotz.me/bookmarks/klotz?action=add&address={quote_plus(link)}&description={quote_plus(description)}&title={quote_plus(title)}&tags={quote_plus(tags)}'
-       return url
+    def decode_scuttle_yaml_output(self, url, data: Dict[str, str]):
+    # Decode the output from the Scuttle tool
+        try:
+            link = data.get('link', url)
+            title = data.get('title', '')
+            description = data.get('description', '')
+            tags = self.list_to_comma_separated(data['keywords', '']) 
+        except Exception as e:
+            logger.error(f"[ERROR] cannot decode YAML; data='%s'", data)
+            title = title or 'Error'
+            description = description or data.get('error', 'Error')
+            tags=""
+        url = f'https://scuttle.klotz.me/bookmarks/klotz?action=add&address={quote_plus(link)}&description={quote_plus(description)}&title={quote_plus(title)}&tags={quote_plus(tags)}'
+        return url
 
     def list_to_comma_separated(self, keywords: List[str]):
        # Convert a list of keywords to a comma-separated string
