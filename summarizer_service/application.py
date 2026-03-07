@@ -213,16 +213,16 @@ class ScuttleCard(URLCard):
             link = data.get('link', url)
             title = data.get('title', '')
             description = data.get('description', '')
-            tags = self.list_to_comma_separated(data['keywords', '']) 
+            tags = self.list_to_comma_separated(data.get('keywords', ''))
         except Exception as e:
-            logger.error(f"[ERROR] cannot decode YAML; data='%s'", data)
+            logger.error(f"[ERROR] '%s' cannot decode YAML; data='%s'", e, data)
             title = title or 'Error'
             description = description or data.get('error', 'Error')
             tags=""
         url = f'https://scuttle.klotz.me/bookmarks/klotz?action=add&address={quote_plus(link)}&description={quote_plus(description)}&title={quote_plus(title)}&tags={quote_plus(tags)}'
         return url
 
-    def list_to_comma_separated(self, keywords: List[str]):
+    def list_to_comma_separated(self, keywords):
        # Convert a list of keywords to a comma-separated string
        if isinstance(keywords, list):
           return ', '.join(keywords)
