@@ -295,11 +295,19 @@ class ViaAPIModelCard(BaseCard):
 
     def get_models_list(self):
        # use shell via to get the newline separated list of model names into an array of strings
-       models_list = subprocess.check_output([VIA_BIN, self.LIST_MODELS_FLAG]).decode('utf-8').split('\n')
-       models_list = [ model_name.strip() for model_name in models_list ]
+       models_list = self.fetch_models_list()
        popular_models = app.config['MODEL_TRACKER'].get_sorted()
        models_list = popular_models + ["----"] + models_list
        return models_list
+   
+    def fetch_models_list(self):
+       try:
+           models_list = subprocess.check_output([VIA_BIN, self.LIST_MODELS_FLAG]).decode('utf-8').split('\n')
+       except Exception as e:
+           logger.error(f"Error executing `via --list-models command`: {e}")
+           return []
+       return [ model_name.strip() for model_name in models_list ]
+
 
     def process(self):
        super().process()
