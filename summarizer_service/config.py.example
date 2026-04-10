@@ -9,5 +9,5 @@ HELP_BIN="/home/klotz/wip/llamafiles/scripts/help.sh"
 BX_BIN="/home/klotz/wip/llamafiles/scripts/bx"
 OPENAPI_UI_SERVER="http://localhost:7860"
 LLAMAFILES_LINK="https://github.com/leighklotz/llamafiles"
-STATUS_BIN='/home/klotz/wip/summarizer-service/status.sh'
+STATUS_BIN='/home/klotz/wip/summarizer-service/scripts/status.sh'
 
