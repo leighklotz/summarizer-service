@@ -208,7 +208,10 @@ class ScuttleCard(URLCard):
             return result, full_text
 
     def decode_scuttle_yaml_output(self, url, data: Dict[str, str]):
-    # Decode the output from the Scuttle tool
+        # Decode the output from the Scuttle tool
+        if data is None:
+            data = {}
+        
         try:
             link = data.get('link', url)
             title = data.get('title', '')

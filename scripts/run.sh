@@ -29,6 +29,22 @@ case "$model_name" in
         unset USE_SYSTEM_ROLE
         unset VIA_API_INHIBIT_GRAMMAR
         ;;
+    **gemma*4*)
+        export ADD_BOS=""       # do not use unset for ADD_BOS                  
+        export INFERENCE_MODE=instruct
+        export KEEP_PROMPT_TEMP_FILE=ERRORS
+        export MIN_P=0.05
+        export REPEAT_PENALTY=1.0
+        export SEED=123
+        export TEMPERATURE=1.0
+        export TOP_K=64
+        export TOP_P=0.95
+        export VIA=api
+	export ENABLE_THINKING=1
+        unset INHIBIT_GRAMMAR
+        unset USE_SYSTEM_ROLE
+        unset VIA_API_INHIBIT_GRAMMAR
+        ;;
     *Magistral*)
         unset USE_SYSTEM_ROLE
         export TEMPERATURE=0.70
