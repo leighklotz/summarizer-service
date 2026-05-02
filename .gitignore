@@ -7,3 +7,4 @@ flask_session
 *.pyd
 *.pyo
 .venv
+.hallux
