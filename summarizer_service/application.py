@@ -110,7 +110,7 @@ class BaseCard:
         return []
 
     def get_model_name(self):
-        return self._get_via_script('hx', GET_MODEL_NAME_FLAG)
+        return self._get_via_script(GET_MODEL_NAME)
 
     def _get_model_info(self):
         model_name = self.get_model_name()
@@ -127,7 +127,7 @@ class BaseCard:
             return None
 
     def get_stats(self):
-        nvfree = self._get_via_script(NVFREE_BIN) or '0'
+        nvfree = 0
         stats = {'nvfree': nvfree}
         model_info = self._get_model_info()
         stats.update(model_info)
