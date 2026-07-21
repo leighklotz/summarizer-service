@@ -281,7 +281,6 @@ class AskCard(BaseCard):
         try:
             super().process()
             my_input = (self.divider + '\n' + self.context)
-            logger.info(f"self.divider={self.divider} {my_input=}")
             self.answer = subprocess.check_output(['ask', '--answer', self.question], input=my_input.encode('utf-8')).decode('utf-8')
             app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
             return self.get_template()
