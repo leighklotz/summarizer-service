@@ -80,8 +80,6 @@ class ModelTracker:
         return sorted_keys
 
 class BaseCard:
-    GET_MODEL_NAME_FLAG = '--get-model-name'
-
     def __init__(self, template: str, params: List[str]=[]):
         self.template = template
         self.params = params
@@ -112,7 +110,7 @@ class BaseCard:
         return []
 
     def get_model_name(self):
-        return self._get_via_script(VIA_BIN, self.GET_MODEL_NAME_FLAG)
+        return self._get_via_script('hx', GET_MODEL_NAME_FLAG)
 
     def _get_model_info(self):
         model_name = self.get_model_name()
@@ -284,7 +282,7 @@ class AskCard(BaseCard):
             super().process()
             my_input = (self.divider + '\n' + self.context)
             logger.info(f"self.divider={self.divider} {my_input=}")
-            self.answer = subprocess.check_output([ASK_BIN, 'any', self.question], input=my_input.encode('utf-8')).decode('utf-8')
+            self.answer = subprocess.check_output(['ask', self.question], input=my_input.encode('utf-8')).decode('utf-8')
             app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
             return self.get_template()
         except Exception as e:
@@ -311,7 +309,7 @@ class ViaAPIModelCard(BaseCard):
    
     def fetch_models_list(self):
        try:
-           models_list = subprocess.check_output([VIA_BIN, self.LIST_MODELS_FLAG]).decode('utf-8').split('\n')
+           models_list = subprocess.check_output([HX_BIN, self.LIST_MODELS_FLAG]).decode('utf-8').split('\n')
        except Exception as e:
            logger.error(f"Error executing `via --list-models command`: {e}")
            return []
@@ -321,7 +319,7 @@ class ViaAPIModelCard(BaseCard):
     def process(self):
        super().process()
        if self.model_name:
-          self.output = subprocess.check_output([VIA_BIN, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
+          self.output = subprocess.check_output([HX_BIN, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8')
        return self.get_template()
 
 class HomeCard(BaseCard):

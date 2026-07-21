@@ -12,10 +12,9 @@ source "${PROJECT_ROOT}/summarizer_service/config.py"
 export SECRET_KEY
 SECRET_KEY="$(openssl rand -hex 24)"
 
-source ~/wip/answer/bin/commands/hx-bootstrap.sh
-hx enable
+source ~/wip/answer/bin/commands/enable
+
 model_name="$(hx model)"
-#model_name="$(${VIA_BIN} --get-model-name)"
 case "$model_name" in
     *gemma*3*)
         export ADD_BOS=""       # do not use unset for ADD_BOS                  
