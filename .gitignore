@@ -8,3 +8,4 @@ flask_session
 *.pyo
 .venv
 .hallux
+.hallux/
