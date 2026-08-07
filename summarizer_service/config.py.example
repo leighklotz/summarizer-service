@@ -1,13 +1,9 @@
+OPENAPI_UI_SERVER="http://localhost:7860"
 LISTEN_HOST='0.0.0.0'
 PORT=8080
-SCUTTLE_BIN="/home/klotz/wip/llamafiles/scripts/scuttle.sh"
-SUMMARIZE_BIN="/home/klotz/wip/llamafiles/scripts/summarize.sh"
-NVFREE_BIN="/home/klotz/wip/llamafiles/scripts/nvfree.sh"
-VIA_BIN="/home/klotz/wip/llamafiles/scripts/via.sh"
-ASK_BIN="/home/klotz/wip/llamafiles/scripts/ask.sh"
-HELP_BIN="/home/klotz/wip/llamafiles/scripts/help.sh"
-BX_BIN="/home/klotz/wip/llamafiles/scripts/bx"
-OPENAPI_UI_SERVER="http://localhost:7860"
-LLAMAFILES_LINK="https://github.com/leighklotz/llamafiles"
-STATUS_BIN='/home/klotz/wip/summarizer-service/scripts/status.sh'
+SCUTTLE_BIN="/home/USER/wip/answer/bin/scuttle.sh"
+SUMMARIZE_BIN="/home/USER/wip/answer/bin/summarize.sh"
+GET_MODEL_NAME="/home/USER/wip/answer/bin/commands/model.sh"
+NVFREE_BIN="/home/USER/wip/answer/bin/nvfree.sh"
+STATUS_BIN='/home/USER/wip/summarizer-service/scripts/status.sh'
 
