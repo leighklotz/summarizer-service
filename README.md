@@ -11,9 +11,10 @@ Copyright 2024-2025 Leigh Klotz
 ![Summarizer Screenshot](docs/summarizer-screenshot.png)
 
 ### Installation
-The app is designed to use  <a href="https://github.com/leighklotz/llamafiles">llamafiles</a>, but is easily adapted to use other mechanisms for LLM access.
+The app uses <a href="https://github.com/leighklotz/answer>answer</a>, but is easily adapted to use other mechanisms for LLM access.
 
-Install <a href="https://github.com/leighklotz/llamafiles">llamafiles</a> and edit `config.py` accordingly.
+Install the `answer` and edit `config.py`:
+
 ```bash
 cp config.py.example config.py
 emacs config.py
@@ -64,7 +65,7 @@ javascript:(  function() %7B    var x = document;    var a = encodeURIComponent(
 Ask a question with optional context (defaults to current selection) and open a window with the answer.
 
 ```javascript
-javascript:(  function() %7B    var x = document;    var d = encodeURIComponent(window.getSelection()).replace(/%20/g, '+');    open('https://nuc1-psy.klotz.me/card/ask?question=context=%27%20+%20d,%20%27Ask20-%20example.com%27,%20%27modal=1,status=0,scrollbars=1,toolbar=0,resizable=1,width=790,height=465,left=%27%20+%20(screen.width-790)/2%20+%20%27,top=%27%20+%20(screen.height-425)/2);%20%20%7D)();
+javascript:(  function() %7B    var x = document;    var d = encodeURIComponent(window.getSelection()).replace(/%20/g, '+');    open('https://host.example.com/card/ask?question=context=%27%20+%20d,%20%27Ask20-%20example.com%27,%20%27modal=1,status=0,scrollbars=1,toolbar=0,resizable=1,width=790,height=465,left=%27%20+%20(screen.width-790)/2%20+%20%27,top=%27%20+%20(screen.height-425)/2);%20%20%7D)();
 ```
 
 # Sessions
@@ -72,3 +73,4 @@ See `flask_sessions/` for session data, which will accumulate files, some contai
 
 ### License
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
