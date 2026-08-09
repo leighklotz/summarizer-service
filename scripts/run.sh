@@ -47,6 +47,9 @@ case "$model_name" in
         unset USE_SYSTEM_ROLE
         unset VIA_API_INHIBIT_GRAMMAR
         ;;
+    *qwen*)
+        true
+        ;;
     *Magistral*)
         unset USE_SYSTEM_ROLE
         export TEMPERATURE=0.70
