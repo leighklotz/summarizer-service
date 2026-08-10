@@ -50,6 +50,9 @@ case "$model_name" in
     *qwen*)
         true
         ;;
+    *muse-glimmer-30b*)
+        true
+        ;;
     *Magistral*)
         unset USE_SYSTEM_ROLE
         export TEMPERATURE=0.70
