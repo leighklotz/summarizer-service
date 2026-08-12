@@ -198,7 +198,7 @@ class ScuttleCard(URLCard):
                 result = yaml.safe_load(output)  # Use safe_load for security
             except yaml.YAMLError as e:
                 full_text = self.read_file(capture_filename)
-                logger.error(f"[ERROR] cannot parse output: output='%s' full_text='%s'", output, full_text)
+                logger.error(f"[ERROR] cannot parse output: {capture_filename=} {output=} {full_text=}")
                 # import pdb; pdb.set_trace()
                 raise
             
