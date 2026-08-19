@@ -12,63 +12,6 @@ source "${PROJECT_ROOT}/summarizer_service/config.py"
 export SECRET_KEY
 SECRET_KEY="$(openssl rand -hex 24)"
 
-source ~/wip/answer/bin/commands/enable
-
-model_name="$(hx model)"
-case "$model_name" in
-    *gemma*3*)
-        export ADD_BOS=""       # do not use unset for ADD_BOS                  
-        export INFERENCE_MODE=instruct
-        export KEEP_PROMPT_TEMP_FILE=ERRORS
-        export MIN_P=0.05
-        export REPEAT_PENALTY=1.0
-        export SEED=123
-        export TEMPERATURE=0.8
-        export TOP_K=40
-        export TOP_P=0.95
-        export VIA=api
-        unset INHIBIT_GRAMMAR
-        unset USE_SYSTEM_ROLE
-        unset VIA_API_INHIBIT_GRAMMAR
-        ;;
-    **gemma*4*)
-        export ADD_BOS=""       # do not use unset for ADD_BOS                  
-        export INFERENCE_MODE=instruct
-        export KEEP_PROMPT_TEMP_FILE=ERRORS
-        export MIN_P=0.05
-        export REPEAT_PENALTY=1.0
-        export SEED=123
-        export TEMPERATURE=1.0
-        export TOP_K=64
-        export TOP_P=0.95
-        export VIA=api
-	export ENABLE_THINKING=1
-        unset INHIBIT_GRAMMAR
-        unset USE_SYSTEM_ROLE
-        unset VIA_API_INHIBIT_GRAMMAR
-        ;;
-    *qwen*)
-        true
-        ;;
-    *muse-glimmer-30b*)
-        true
-        ;;
-    *Magistral*)
-        unset USE_SYSTEM_ROLE
-        export TEMPERATURE=0.70
-        export TOP_P=0.95
-        export INFERENCE_MODE=instruct
-        ;;
-    gpt-oss*)
-        unset USE_SYSTEM_ROLE
-        export temperature=1.0
-        export top_p=1.0
-        export top_k=0
-        export INFERENCE_MODE=instruct
-        ;;
-    *)
-        echo "* Unknown model $model_name"
-        exit 1
-esac
+source ~/wip/answer/bin/commands/hx-bootstrap.sh && hx core
 
 gunicorn --workers=2 --log-level=info --access-logfile - -b "${LISTEN_HOST}":"${PORT}" --timeout 900 "summarizer_service:app" --limit-request-line 0
