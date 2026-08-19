@@ -25,6 +25,14 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 
 
+def _decode_utf8(data: bytes) -> str:
+    try:
+        return data.decode('utf-8')
+    except UnicodeDecodeError:
+        logger.warning("UTF-8 decode fallback with replacement due to decoding error")
+        return data.decode('utf-8', errors='replace')
+
+
 MAIN_HEADER = {
     "/card/home": "Home",
     "/card/scuttle?autosubmit=false": "Scuttle",
@@ -122,7 +130,7 @@ class BaseCard:
 
     def _get_via_script(self, script_bin: str, *args):
         try:
-            return (subprocess.check_output([script_bin] + list(args)).decode('utf-8', errors='replace') or '').strip()
+            return (_decode_utf8(subprocess.check_output([script_bin] + list(args))) or '').strip()
         except subprocess.CalledProcessError:
             return None
 
@@ -191,7 +199,7 @@ class ScuttleCard(URLCard):
             capture_filename = temp.name
             scuttle_call = [SCUTTLE_BIN, '--capture-file', capture_filename, '--yaml', shlex.quote(url)]
             logger.info(f"scuttle {url=} {capture_filename=} {scuttle_call=}")
-            output = subprocess.check_output(scuttle_call).decode('utf-8', errors='replace')
+            output = _decode_utf8(subprocess.check_output(scuttle_call))
             # logger.trace(f"scuttle {url=} {capture_filename=} {output=}")
 
             try:
@@ -251,7 +259,7 @@ class SummarizeCard(URLCard):
     def process(self):
         try:
             super().process()
-            self.summary = subprocess.check_output([SUMMARIZE_BIN, self.url, self.prompt]).decode('utf-8', errors='replace')
+            self.summary = _decode_utf8(subprocess.check_output([SUMMARIZE_BIN, self.url, self.prompt]))
             app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
             # hack: propagate summary to Ask context
             session['summary'] = self.summary
@@ -281,7 +289,7 @@ class AskCard(BaseCard):
         try:
             super().process()
             my_input = (self.divider + '\n' + self.context)
-            self.answer = subprocess.check_output(['ask', '--answer', self.question], input=my_input.encode('utf-8')).decode('utf-8', errors='replace')
+            self.answer = _decode_utf8(subprocess.check_output(['ask', '--answer', self.question], input=my_input.encode('utf-8')))
             app.config['MODEL_TRACKER'].note_usage(self.get_model_name())
             return self.get_template()
         except Exception as e:
@@ -308,7 +316,7 @@ class ViaAPIModelCard(BaseCard):
    
     def fetch_models_list(self):
        try:
-           models_list = subprocess.check_output([HX_BIN, self.LIST_MODELS_FLAG]).decode('utf-8', errors='replace').split('\n')
+           models_list = _decode_utf8(subprocess.check_output([HX_BIN, self.LIST_MODELS_FLAG])).split('\n')
        except Exception as e:
            logger.error(f"Error executing `via --list-models command`: {e}")
            return []
@@ -318,7 +326,7 @@ class ViaAPIModelCard(BaseCard):
     def process(self):
        super().process()
        if self.model_name:
-          self.output = subprocess.check_output([HX_BIN, self.LOAD_MODEL_FLAG, self.model_name]).decode('utf-8', errors='replace')
+          self.output = _decode_utf8(subprocess.check_output([HX_BIN, self.LOAD_MODEL_FLAG, self.model_name]))
        return self.get_template()
 
 class HomeCard(BaseCard):
